@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 interface ModalProps {
   isOpen: boolean;
   imageSrc: string | null;
@@ -15,15 +17,20 @@ export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
       onClick={onClose}
     >
       <div className="bg-white border-4 border-ink rounded-lg p-2 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <img
-          src={imageSrc || ''}
-          alt="Photo"
-          className="block border-lg rounded"
-          style={{
-            width: 'clamp(150px, 65vw, 380px)',
-            borderRadius: '4px',
-          }}
-        />
+        <div style={{
+          width: 'clamp(150px, 65vw, 380px)',
+          aspectRatio: '1',
+          position: 'relative',
+        }}>
+          <Image
+            src={imageSrc || ''}
+            alt="Photo"
+            fill
+            className="rounded"
+            style={{ borderRadius: '4px', objectFit: 'cover' }}
+            unoptimized
+          />
+        </div>
       </div>
       <button
         onClick={onClose}

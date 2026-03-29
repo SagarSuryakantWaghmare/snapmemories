@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import HomeScreen from '@/components/HomeScreen';
 import BoothScreen from '@/components/BoothScreen';
 import ResultScreen from '@/components/ResultScreen';
@@ -20,14 +20,19 @@ export default function Home() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [showPrinting, setShowPrinting] = useState(false);
   const [showFinalKiosk, setShowFinalKiosk] = useState(false);
-  const [showActionRow, setShowActionRow] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const cellRefsArray = useRef<HTMLDivElement[]>([]);
+
+  const stopCamera = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+  }, [stream]);
 
   useEffect(() => {
     if (currentScreen === 'booth') {
@@ -38,7 +43,7 @@ export default function Home() {
         stopCamera();
       }
     };
-  }, [currentScreen]);
+  }, [currentScreen, stopCamera]);
 
   async function startCamera() {
     try {
@@ -52,13 +57,6 @@ export default function Home() {
       }
     } catch (e) {
       console.warn('Camera not available:', e);
-    }
-  }
-
-  function stopCamera() {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
     }
   }
 
@@ -102,7 +100,7 @@ export default function Home() {
         moveLiveToCell(i);
       }
       await countdownInCell(i, 3);
-      const captured = captureCell(i);
+      const captured = captureCell();
       if (captured !== null) {
         newPhotos[i] = captured as string;
       }
@@ -159,7 +157,7 @@ export default function Home() {
     });
   }
 
-  function captureCell(index: number): string | null {
+  function captureCell(): string | null {
     if (!videoRef.current || !canvasRef.current) return null;
     const url = captureVideoFrame(videoRef.current, canvasRef.current, { isBW });
     return url;
@@ -258,7 +256,6 @@ export default function Home() {
           photos={filteredPhotos.map((f, i) => f || photos[i])}
           showPrinting={showPrinting}
           showFinalKiosk={showFinalKiosk}
-          showActionRow={showActionRow}
           currentFilter={currentFilter}
           onFilterClick={(filter, el) => applyFilter(filter as FilterName, el)}
           onDownload={() => downloadCompositeImage(filteredPhotos.map((f, i) => f || photos[i]))}

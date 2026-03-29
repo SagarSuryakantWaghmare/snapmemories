@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 
 interface BoothScreenProps {
   isBW: boolean;
@@ -9,7 +10,7 @@ interface BoothScreenProps {
   onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onHome: () => void;
   recordDisabled: boolean;
-  videoRef: React.RefObject<HTMLVideoElement>;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
   cells: Array<{
     type: 'live' | 'empty' | 'filled';
     src?: string;
@@ -106,7 +107,7 @@ export default function BoothScreen({
                     </>
                   )}
                   {cell.type === 'filled' && cell.src && (
-                    <img src={cell.src} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                    <Image src={cell.src} alt={`Photo ${i + 1}`} fill className="object-cover" unoptimized />
                   )}
                 </div>
               );

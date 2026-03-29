@@ -1,10 +1,11 @@
 'use client';
 
+import Image from 'next/image';
+
 interface ResultScreenProps {
   photos: (string | null)[];
   showPrinting: boolean;
   showFinalKiosk: boolean;
-  showActionRow: boolean;
   currentFilter: string;
   onFilterClick: (filter: string, el: HTMLButtonElement) => void;
   onDownload: () => void;
@@ -17,7 +18,6 @@ export default function ResultScreen({
   photos,
   showPrinting,
   showFinalKiosk,
-  showActionRow,
   currentFilter,
   onFilterClick,
   onDownload,
@@ -122,9 +122,9 @@ export default function ResultScreen({
               style={{ width: '100%', maxWidth: '280px', aspectRatio: '4/3.2' }}
             >
               {photos.map((photo, i) => (
-                <div key={i} className="overflow-hidden bg-gray-800">
+                <div key={i} className="overflow-hidden bg-gray-800 relative">
                   {photo ? (
-                    <img src={photo} alt={`Photo ${i + 1}`} className="w-full h-full object-cover cursor-pointer" />
+                    <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover cursor-pointer" unoptimized />
                   ) : (
                     <div className="w-full h-full bg-gray-700 flex items-center justify-center text-gray-500 text-xs" style={{ fontFamily: "'Patrick Hand', cursive" }}>
                       No image
