@@ -6,99 +6,70 @@ interface HomeScreenProps {
 
 export default function HomeScreen({ onEnter }: HomeScreenProps) {
   return (
-    <div className="screen-active min-h-screen w-full flex flex-col items-center justify-center gap-6 p-4 md:p-8">
+    <div className="w-screen h-screen flex flex-col items-center justify-center gap-4 md:gap-6 p-4 bg-bg overflow-hidden">
       {/* Title */}
-      <h1 className="font-caveat text-5xl md:text-6xl font-bold text-ink text-center leading-tight -tracking-tighter">
-        mysketchbooth
+      <h1
+        className="text-center"
+        style={{
+          fontFamily: "'Caveat', cursive",
+          fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+          color: '#111',
+          fontWeight: 700,
+          letterSpacing: '2px',
+        }}
+      >
+        MY SKETCH BOOTH
       </h1>
 
       {/* Subtitle */}
-      <p className="font-patrick text-lg text-ink2 text-center max-w-sm leading-relaxed">
-        A free vintage online photobooth — take 4 snaps, get your strip!
+      <p
+        className="text-center max-w-xs"
+        style={{
+          fontFamily: "'Patrick Hand', cursive",
+          fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+          color: '#333',
+          lineHeight: 1.5,
+        }}
+      >
+        Free vintage photo booth — take 4 snaps, get your strip!
       </p>
 
-      {/* SVG Booth Illustration */}
+      {/* SVG Booth Icon */}
       <svg
-        className="w-48 md:w-72 h-auto cursor-pointer transition-transform duration-200 hover:scale-104 hover:-rotate-1 drop-shadow-lg"
-        onClick={onEnter}
+        width="200"
+        height="240"
         viewBox="0 0 240 290"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
+        className="my-2 md:my-4"
+        style={{ maxHeight: '35vh' }}
+        onClick={onEnter}
       >
-        {/* body */}
-        <rect x="20" y="50" width="200" height="210" rx="14" fill="#fff" stroke="#111" strokeWidth="4" />
-        {/* top banner */}
-        <rect x="20" y="50" width="200" height="40" rx="14" fill="#111" />
-        <rect x="20" y="74" width="200" height="16" fill="#111" />
-        <text
-          x="120"
-          y="77"
-          fontFamily="Caveat,cursive"
-          fontSize="17"
-          fontWeight="700"
-          fill="#fff"
-          textAnchor="middle"
-        >
-          PHOTO BOOTH
-        </text>
-        {/* inner frame */}
-        <rect x="34" y="102" width="172" height="120" rx="6" fill="#111" stroke="#111" strokeWidth="3" />
-        {/* 2x2 grid */}
-        <rect x="36" y="104" width="83" height="57" rx="2" fill="#2a2a2a" />
-        <rect x="121" y="104" width="83" height="57" rx="2" fill="#333" />
-        <rect x="36" y="163" width="83" height="57" rx="2" fill="#e8e5e0" stroke="#ccc" strokeWidth="1.5" />
-        <rect x="121" y="163" width="83" height="57" rx="2" fill="#e8e5e0" stroke="#ccc" strokeWidth="1.5" />
-        <text x="77" y="197" fontFamily="sans-serif" fontSize="20" fill="#bbb" textAnchor="middle">
-          +
-        </text>
-        <text x="162" y="197" fontFamily="sans-serif" fontSize="20" fill="#bbb" textAnchor="middle">
-          +
-        </text>
-        {/* coin slot */}
-        <rect x="90" y="234" width="60" height="14" rx="7" fill="#e0dcd4" stroke="#111" strokeWidth="2" />
-        <rect x="112" y="238" width="16" height="4" rx="2" fill="#111" />
-        {/* base */}
-        <rect x="30" y="252" width="180" height="6" rx="3" fill="#ccc" stroke="#111" strokeWidth="1.5" />
-        {/* legs */}
-        <rect x="55" y="256" width="14" height="26" rx="3" fill="#111" />
-        <rect x="171" y="256" width="14" height="26" rx="3" fill="#111" />
-        {/* $0 badge */}
-        <circle cx="196" cy="150" r="22" fill="#fff" stroke="#111" strokeWidth="3" />
-        <text x="196" y="147" fontFamily="Caveat,cursive" fontSize="11" fontWeight="700" fill="#111" textAnchor="middle">
-          $0
-        </text>
-        <text x="196" y="160" fontFamily="Caveat,cursive" fontSize="9" fill="#111" textAnchor="middle">
-          4 pics
-        </text>
+        <rect x="30" y="60" width="180" height="210" fill="none" stroke="#111" strokeWidth="3" />
+        <rect x="55" y="85" width="130" height="160" fill="#f0eeeb" stroke="#111" strokeWidth="2" />
+        <circle cx="120" cy="55" r="18" fill="none" stroke="#111" strokeWidth="2" />
+        <circle cx="120" cy="55" r="12" fill="none" stroke="#111" strokeWidth="1.5" />
+        <rect x="145" y="40" width="25" height="15" fill="none" stroke="#111" strokeWidth="1.5" rx="2" />
+        <path d="M 80 110 L 90 100 L 150 100 L 160 110" fill="none" stroke="#111" strokeWidth="1.5" />
+        <circle cx="200" cy="140" r="6" fill="none" stroke="#111" strokeWidth="1.5" />
+        <circle cx="200" cy="165" r="6" fill="none" stroke="#111" strokeWidth="1.5" />
+        <circle cx="200" cy="190" r="6" fill="none" stroke="#111" strokeWidth="1.5" />
+        <line x1="55" y1="270" x2="40" y2="290" stroke="#111" strokeWidth="2" />
+        <line x1="185" y1="270" x2="200" y2="290" stroke="#111" strokeWidth="2" />
       </svg>
 
-      {/* ENTER Button */}
+      {/* Enter Button */}
       <button
         onClick={onEnter}
-        className="font-caveat text-2xl font-bold bg-ink text-white border-none px-12 py-3 rounded cursor-pointer shadow-lg transition-all duration-100 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-px active:shadow-md"
+        className="mt-6 px-10 py-3 bg-ink text-bg font-bold rounded-lg hover:shadow-lg active:shadow-none transition-shadow"
         style={{
-          boxShadow: '4px 4px 0 #555',
-          letterSpacing: '1px',
-        }}
-        onMouseDown={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = '2px 2px 0 #555';
-        }}
-        onMouseUp={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = '4px 4px 0 #555';
+          fontFamily: "'Caveat', cursive",
+          fontSize: 'clamp(1.1rem, 4vw, 1.4rem)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         }}
       >
         ENTER
       </button>
 
-      {/* Footer Note */}
-      <p className="font-patrick text-sm text-gray-500">
-        no sign-up · free forever · works everywhere
-      </p>
-
-      {/* Copyright */}
-      <footer className="text-center font-patrick text-xs text-gray-400 mt-8">
-        © 2025 Sagar Suryakant Waghmare. All rights reserved.
-      </footer>
     </div>
   );
 }
+  

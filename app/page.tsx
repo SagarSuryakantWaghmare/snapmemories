@@ -6,15 +6,12 @@ import BoothScreen from '@/components/BoothScreen';
 import ResultScreen from '@/components/ResultScreen';
 import Modal from '@/components/Modal';
 import { captureVideoFrame, downloadCompositeImage, delay } from '@/utils/canvas';
-import { filterImageData, applyFilterToCanvas, type FilterName } from '@/utils/filters';
+import { filterImageData, type FilterName } from '@/utils/filters';
 
 type Screen = 'home' | 'booth' | 'result';
 
 export default function Home() {
-  // Navigation
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
-
-  // State
   const [photos, setPhotos] = useState<(string | null)[]>([null, null, null, null]);
   const [filteredPhotos, setFilteredPhotos] = useState<(string | null)[]>([null, null, null, null]);
   const [isBW, setIsBW] = useState(false);
@@ -24,18 +21,14 @@ export default function Home() {
   const [showPrinting, setShowPrinting] = useState(false);
   const [showFinalKiosk, setShowFinalKiosk] = useState(false);
   const [showActionRow, setShowActionRow] = useState(false);
-
-  // Modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState<string | null>(null);
 
-  // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cellRefsArray = useRef<HTMLDivElement[]>([]);
 
-  // Camera setup
   useEffect(() => {
     if (currentScreen === 'booth') {
       startCamera();
@@ -69,7 +62,6 @@ export default function Home() {
     }
   }
 
-  // Navigation
   function goHome() {
     stopCamera();
     resetAll();
@@ -81,7 +73,6 @@ export default function Home() {
     setCurrentScreen('booth');
   }
 
-  // Toggle B&W
   function toggleBW(checked: boolean) {
     setIsBW(checked);
     if (videoRef.current) {
@@ -89,7 +80,6 @@ export default function Home() {
     }
   }
 
-  // Reset all
   function resetAll() {
     setPhotos([null, null, null, null]);
     setFilteredPhotos([null, null, null, null]);
@@ -101,34 +91,22 @@ export default function Home() {
     setShowActionRow(false);
   }
 
-  // Photo capture workflow
   async function startSession() {
     if (shooting) return;
     setShooting(true);
     setPhotos([null, null, null, null]);
-
-    // Reset cells 1-3 to empty
     const newPhotos = [null, null, null, null];
 
     for (let i = 0; i < 4; i++) {
-      // Move live view to cell i
       if (i > 0) {
         moveLiveToCell(i);
       }
-
-      // Countdown
       await countdownInCell(i, 3);
-
-      // Capture
       const captured = captureCell(i);
       if (captured) {
         newPhotos[i] = captured;
       }
-
-      // Flash animation
       triggerFlash(i);
-
-      // Wait before next shot
       await delay(700);
     }
 
@@ -139,7 +117,6 @@ export default function Home() {
   }
 
   function moveLiveToCell(index: number) {
-    // Video already tracks; just update visual indication
     if (videoRef.current && cellRefsArray.current[index]) {
       const cell = cellRefsArray.current[index];
       if (!cell.querySelector('video')) {
@@ -147,8 +124,7 @@ export default function Home() {
         video.autoplay = true;
         video.playsInline = true;
         video.muted = true;
-        video.style.cssText =
-          'width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)';
+        video.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)';
         if (isBW) {
           video.style.filter = 'grayscale(1) contrast(1.1)';
         }
@@ -197,23 +173,19 @@ export default function Home() {
     }
   }
 
-  // Show result
   async function showResult() {
     stopCamera();
     setCurrentScreen('result');
     setShowFinalKiosk(false);
     setShowActionRow(false);
     setShowPrinting(true);
-
     await delay(1800);
-
     setShowPrinting(false);
     applyFilter('none');
     setShowFinalKiosk(true);
     setShowActionRow(true);
   }
 
-  // Upload photos
   function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files || []).slice(0, 4);
     let done = 0;
@@ -235,7 +207,6 @@ export default function Home() {
     event.target.value = '';
   }
 
-  // Apply filters
   function applyFilter(filterName: FilterName, btn?: HTMLButtonElement) {
     setCurrentFilter(filterName);
     if (btn) {
@@ -256,18 +227,14 @@ export default function Home() {
     });
   }
 
-  // Get cells for render
   const cells = photos.map((src, i) => ({
-    type: (src ? 'filled' : currentScreen === 'booth' && i === 0 ? 'live' : 'empty') as
-      | 'live'
-      | 'empty'
-      | 'filled',
+    type: (src ? 'filled' : currentScreen === 'booth' && i === 0 ? 'live' : 'empty') as 'live' | 'empty' | 'filled',
     src: src || undefined,
     index: i,
   }));
 
   return (
-    <>
+    <div className="w-screen h-screen overflow-hidden bg-bg">
       <canvas ref={canvasRef} className="hidden" />
 
       {currentScreen === 'home' && <HomeScreen onEnter={goToBooth} />}
@@ -305,6 +272,6 @@ export default function Home() {
       )}
 
       <Modal isOpen={modalOpen} imageSrc={modalImage} onClose={() => setModalOpen(false)} />
-    </>
+    </div>
   );
 }
