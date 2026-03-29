@@ -95,7 +95,7 @@ export default function Home() {
     if (shooting) return;
     setShooting(true);
     setPhotos([null, null, null, null]);
-    const newPhotos = [null, null, null, null];
+    const newPhotos: (string | null)[] = [null, null, null, null];
 
     for (let i = 0; i < 4; i++) {
       if (i > 0) {
@@ -103,8 +103,8 @@ export default function Home() {
       }
       await countdownInCell(i, 3);
       const captured = captureCell(i);
-      if (captured) {
-        newPhotos[i] = captured;
+      if (captured !== null) {
+        newPhotos[i] = captured as string;
       }
       triggerFlash(i);
       await delay(700);
