@@ -86,7 +86,6 @@ export default function Home() {
     setCurrentFilter('none');
     setShowPrinting(false);
     setShowFinalKiosk(false);
-    setShowActionRow(false);
   }
 
   async function startSession() {
@@ -175,13 +174,11 @@ export default function Home() {
     stopCamera();
     setCurrentScreen('result');
     setShowFinalKiosk(false);
-    setShowActionRow(false);
     setShowPrinting(true);
     await delay(1800);
     setShowPrinting(false);
     applyFilter('none');
     setShowFinalKiosk(true);
-    setShowActionRow(true);
   }
 
   function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
