@@ -1,28 +1,50 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   html,
   body {
     width: 100%;
-    min-height: 100vh;
-    background: #f0eeeb;
-    font-family: 'Caveat', cursive;
-    color: #111111;
+    height: 100%;
     overflow-x: hidden;
+    background: #FFFFFF;
+    color: #111111;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
-  * {
-    @apply border-border outline-ring/50;
-  }
+
   body {
-    @apply bg-background text-foreground;
+    position: relative;
   }
-  html {
-    @apply font-sans;
+}
+
+@layer utilities {
+  .border-3 {
+    border-width: 3px;
   }
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+button,
+a {
+  transition-property: all;
 }
 
 @layer components {
@@ -148,7 +170,6 @@
   }
 }
 
-/* Keyframe Animations */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -167,6 +188,23 @@
   }
   50% {
     opacity: 0.4;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
   }
 }
 

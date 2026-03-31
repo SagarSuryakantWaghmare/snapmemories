@@ -1,23 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import Image from 'next/image';
-
-interface BoothScreenProps {
-  isBW: boolean;
-  onBWToggle: (checked: boolean) => void;
-  onRecordClick: () => void;
-  onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onHome: () => void;
-  recordDisabled: boolean;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-  cells: Array<{
-    type: 'live' | 'empty' | 'filled';
-    src?: string;
-    index: number;
-  }>;
-  cellRefs: React.RefObject<HTMLDivElement[]>;
-}
+import { useRef, useEffect } from 'react';
+import { BoothScreenProps } from '@/lib/types';
 
 export default function BoothScreen({
   isBW,
@@ -27,139 +11,172 @@ export default function BoothScreen({
   onHome,
   recordDisabled,
   videoRef,
-  cells,
-  cellRefs,
+  photos,
+  currentPhotoIndex,
+  isCapturing,
 }: BoothScreenProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Mirror the videoRef stream to the preview video
+  useEffect(() => {
+    if (videoRef.current && previewVideoRef.current) {
+      previewVideoRef.current.srcObject = videoRef.current.srcObject;
+    }
+  }, [videoRef]);
 
   return (
-    <div className="w-screen h-screen bg-bg flex flex-col overflow-hidden">
+    <div className="w-screen h-screen bg-white flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-6 border-b border-gray-border bg-white flex-shrink-0">
-        <h1
-          onClick={onHome}
-          className="cursor-pointer hover:opacity-70 transition-opacity"
-          style={{
-            fontFamily: "'Caveat', cursive",
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            color: '#111',
-          }}
-        >
-          MY SKETCH BOOTH
-        </h1>
+      <div className="h-16 border-b-2 border-black flex items-center justify-between px-6 shrink-0">
+        <h1 className="text-xl font-bold text-black">Photo Booth</h1>
         <button
           onClick={onHome}
-          className="px-4 py-2 text-sm bg-ink text-bg rounded hover:opacity-90 transition-opacity font-bold"
+          className="px-4 py-2 text-sm font-semibold text-black hover:bg-gray-100 rounded transition-colors"
         >
-          HOME
+          Home
         </button>
       </div>
 
-      {/* Main Content - Horizontal Layout */}
-      <div className="flex-1 flex gap-6 items-center justify-center p-6 overflow-hidden">
-        {/* Grid */}
-        <div className="flex-shrink-0">
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center gap-4 md:gap-8 p-4 md:p-6 overflow-auto max-h-[calc(100vh-4rem)]">
+        {/* Hidden video element - always mounted for reliable capture */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="hidden"
+        />
+        
+        {/* Large Video Preview (Desktop) */}
+        <div className="shrink-0 hidden md:block">
           <div
-            className="border-4 border-ink rounded-xl overflow-hidden bg-ink grid grid-cols-2 gap-1 shadow-lg"
-            style={{ width: 'clamp(200px, 45vw, 420px)', aspectRatio: '4/3.2' }}
+            className="bg-white border-3 border-black rounded-lg p-2 shadow-lg overflow-hidden"
+            style={{ width: '400px', maxWidth: '85vw', aspectRatio: '1/1' }}
           >
-            {[0, 1, 2, 3].map((i) => {
-              const cell = cells[i] || { type: 'empty', index: i };
-              return (
+            <video
+              ref={previewVideoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover rounded"
+              style={{
+                transform: 'scaleX(-1)',
+                filter: isBW ? 'grayscale(1) contrast(1.1)' : 'none',
+              }}
+            />
+          </div>
+        </div>
+        
+        {/* Photo Strip Preview */}
+        <div className="shrink-0">
+          <div
+            className="bg-white border-3 border-black rounded-lg p-2 shadow-lg"
+            style={{ width: '180px', maxWidth: '90vw' }}
+          >
+            <div className="flex flex-col gap-1">
+              {[0, 1, 2, 3].map((index) => (
                 <div
-                  key={i}
-                  ref={(el) => {
-                    if (cellRefs.current) {
-                      cellRefs.current[i] = el!;
-                    }
-                  }}
-                  className="relative overflow-hidden flex items-center justify-center bg-black"
+                  key={index}
+                  className="relative bg-gray-100 border-2 border-gray-300 rounded overflow-hidden"
+                  style={{ width: '100%', aspectRatio: '1/1' }}
+                  id={`photo-cell-${index}`}
                 >
-                  {cell.type === 'live' && (
-                    <>
-                      <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="w-full h-full object-cover block"
-                        style={{ transform: 'scaleX(-1)' }}
-                      />
-                      <div className="flash-cell" id={`flash-${i}`}></div>
-                      <div className="cell-countdown" id={`cdown-${i}`}></div>
-                    </>
+                  {/* Live video preview in first cell when idle (mobile only) */}
+                  {!photos[index] && index === 0 && !isCapturing && (
+                    <video
+                      autoPlay
+                      playsInline
+                      muted
+                      className="absolute inset-0 w-full h-full object-cover md:hidden"
+                      ref={(el) => {
+                        if (el && videoRef.current) {
+                          el.srcObject = videoRef.current.srcObject;
+                        }
+                      }}
+                      style={{
+                        transform: 'scaleX(-1)',
+                        filter: isBW ? 'grayscale(1) contrast(1.1)' : 'none',
+                      }}
+                    />
                   )}
-                  {cell.type === 'empty' && (
-                    <>
-                      <div className="flex flex-col items-center gap-1 text-gray-400">
-                        <span className="text-xl">+</span>
-                        <span
-                          className="text-xs"
-                          style={{
-                            fontFamily: "'Patrick Hand', cursive",
-                          }}
-                        >
-                          Pic {i + 1}
-                        </span>
-                      </div>
-                      <div className="flash-cell" id={`flash-${i}`}></div>
-                    </>
+                  
+                  {/* Captured photo */}
+                  {photos[index] && (
+                    <img
+                      src={photos[index]!}
+                      alt={`Photo ${index + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
                   )}
-                  {cell.type === 'filled' && cell.src && (
-                    <Image src={cell.src} alt={`Photo ${i + 1}`} fill className="object-cover" unoptimized />
+
+                  {/* Empty state - show cell number */}
+                  {!photos[index] && (index > 0 || isCapturing) && (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                      <span className="text-2xl font-bold">{index + 1}</span>
+                    </div>
                   )}
+
+                  {/* Countdown overlay */}
+                  <div
+                    id={`countdown-${index}`}
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-6xl font-bold opacity-0 pointer-events-none transition-opacity"
+                  />
+
+                  {/* Flash effect */}
+                  <div
+                    id={`flash-${index}`}
+                    className="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-100"
+                  />
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Controls Panel */}
-        <div className="flex flex-col gap-4 items-center flex-shrink-0">
-          {/* Record Button */}
-          <div className="flex flex-col items-center gap-2">
-            <button
-              onClick={onRecordClick}
-              disabled={recordDisabled}
-              className="w-16 h-16 bg-white border-4 border-ink rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:shadow-md transition-shadow"
-            >
-              <div className="w-8 h-8 bg-accent rounded-full border-2 border-ink" style={{ boxShadow: '0 0 8px rgba(224,48,48,0.5)' }}></div>
-              <div className="w-4 h-5 bg-ink rounded"></div>
-            </button>
-            <span
-              className="text-xs text-center text-ink2"
-              style={{ fontFamily: "'Patrick Hand', cursive" }}
-            >
-              Press to
-              <br />
-              start
-            </span>
-          </div>
+        {/* Controls */}
+        <div className="flex flex-col items-center gap-4 md:gap-6 shrink-0">
+          {/* Capture Button */}
+          <button
+            onClick={onRecordClick}
+            disabled={recordDisabled || isCapturing}
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-black text-white flex items-center justify-center
+                     border-4 border-gray-300
+                     hover:bg-gray-800 active:bg-gray-900
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-all duration-150 shadow-lg"
+          >
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white" />
+          </button>
+          <p className="text-xs md:text-sm text-gray-600 font-medium">
+            {isCapturing ? 'Capturing...' : 'Capture'}
+          </p>
 
-          {/* BW Toggle */}
-          <div className="flex items-center gap-2" style={{ fontFamily: "'Caveat', cursive", fontSize: '0.95rem', fontWeight: 700 }}>
-            <span className="text-ink cursor-pointer select-none">B&W</span>
-            <label className="relative w-12 h-7 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isBW}
-                onChange={(e) => onBWToggle(e.target.checked)}
-                className="hidden"
+          {/* B&W Toggle */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-gray-700">Color</span>
+            <button
+              onClick={() => onBWToggle(!isBW)}
+              className={`relative w-14 h-8 rounded-full transition-colors ${
+                isBW ? 'bg-black' : 'bg-gray-300'
+              }`}
+            >
+              <div
+                className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                  isBW ? 'translate-x-7' : 'translate-x-1'
+                }`}
               />
-              <div className="sketch-track absolute inset-0 rounded-full bg-gray-slot border border-gray-border"></div>
-              <div className="sketch-thumb absolute top-1 left-1 w-5 h-5 bg-ink rounded-full transition-all duration-200"></div>
-            </label>
-            <span className="text-ink cursor-pointer select-none">Color</span>
+            </button>
+            <span className="text-sm font-medium text-gray-700">B&W</span>
           </div>
 
           {/* Upload Button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="mt-4 px-4 py-2 border-2 border-dashed border-ink rounded text-ink2 text-xs font-bold hover:bg-black/5 transition-colors"
-            style={{ fontFamily: "'Patrick Hand', cursive", width: '120px' }}
+            className="px-6 py-2 border-2 border-black text-black font-medium rounded hover:bg-gray-100 transition-colors"
           >
-            Upload
+            Upload Photos
           </button>
           <input
             ref={fileInputRef}

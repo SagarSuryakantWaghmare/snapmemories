@@ -3,233 +3,334 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import HomeScreen from '@/components/HomeScreen';
 import BoothScreen from '@/components/BoothScreen';
+import FrameSelection from '@/components/FrameSelection';
 import ResultScreen from '@/components/ResultScreen';
 import Modal from '@/components/Modal';
-import { captureVideoFrame, downloadCompositeImage, delay } from '@/utils/canvas';
-import { filterImageData, type FilterName } from '@/utils/filters';
-
-type Screen = 'home' | 'booth' | 'result';
+import { Screen, FilterName } from '@/lib/types';
+import { startCamera, stopCamera, captureVideoFrame, applyVideoFilter } from '@/lib/camera';
+import { downloadCompositeImage, delay } from '@/lib/canvas';
+import { batchFilterImages } from '@/lib/filters';
+import { PHOTO_COUNT, COUNTDOWN_SECONDS, FLASH_DURATION_MS, CAPTURE_DELAY_MS, PRINTING_ANIMATION_MS } from '@/lib/constants';
 
 export default function Home() {
+  // Screen navigation
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
-  const [photos, setPhotos] = useState<(string | null)[]>([null, null, null, null]);
-  const [filteredPhotos, setFilteredPhotos] = useState<(string | null)[]>([null, null, null, null]);
+  
+  // Photo state
+  const [photos, setPhotos] = useState<(string | null)[]>(Array(PHOTO_COUNT).fill(null));
+  const [filteredPhotos, setFilteredPhotos] = useState<(string | null)[]>(Array(PHOTO_COUNT).fill(null));
   const [isBW, setIsBW] = useState(false);
-  const [shooting, setShooting] = useState(false);
   const [currentFilter, setCurrentFilter] = useState<FilterName>('none');
+  
+  // Capture state
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  
+  // Camera state
   const [stream, setStream] = useState<MediaStream | null>(null);
+  
+  // Frame selection
+  const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
+  
+  // Result screen state
   const [showPrinting, setShowPrinting] = useState(false);
   const [showFinalKiosk, setShowFinalKiosk] = useState(false);
+  
+  // Modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState<string | null>(null);
-
+  
+  // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cellRefsArray = useRef<HTMLDivElement[]>([]);
 
-  const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
-  }, [stream]);
-
-  useEffect(() => {
-    if (currentScreen === 'booth') {
-      startCamera();
-    }
-    return () => {
-      if (currentScreen !== 'booth') {
-        stopCamera();
-      }
-    };
-  }, [currentScreen, stopCamera]);
-
-  async function startCamera() {
+  // Camera management
+  const initCamera = useCallback(async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: 1280, height: 960 },
-        audio: false,
-      });
+      const mediaStream = await startCamera();
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        
+        // Wait for video to be ready
+        await new Promise<void>((resolve) => {
+          const video = videoRef.current;
+          if (!video) {
+            resolve();
+            return;
+          }
+          
+          // If video is already ready, resolve immediately
+          if (video.readyState >= 2) {
+            console.log('Video already ready');
+            resolve();
+            return;
+          }
+          
+          // Wait for loadeddata event
+          const onLoadedData = () => {
+            console.log('Video loaded and ready', {
+              videoWidth: video.videoWidth,
+              videoHeight: video.videoHeight,
+              readyState: video.readyState
+            });
+            video.removeEventListener('loadeddata', onLoadedData);
+            resolve();
+          };
+          
+          video.addEventListener('loadeddata', onLoadedData);
+          
+          // Fallback timeout
+          setTimeout(() => {
+            console.log('Video load timeout, continuing anyway');
+            video.removeEventListener('loadeddata', onLoadedData);
+            resolve();
+          }, 5000);
+        });
       }
-    } catch (e) {
-      console.warn('Camera not available:', e);
+    } catch (error) {
+      console.error('Failed to start camera:', error);
+      alert('Unable to access camera. Please check permissions.');
     }
-  }
+  }, []);
 
-  function goHome() {
-    stopCamera();
+  const cleanupCamera = useCallback(() => {
+    if (stream) {
+      stopCamera(stream);
+      setStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, [stream]);
+
+  // Start camera when entering booth screen
+  useEffect(() => {
+    if (currentScreen === 'booth') {
+      initCamera();
+    } else {
+      cleanupCamera();
+    }
+    
+    return () => {
+      if (currentScreen !== 'booth') {
+        cleanupCamera();
+      }
+    };
+  }, [currentScreen]); // Only depend on currentScreen
+
+  // Apply B&W filter to video
+  useEffect(() => {
+    if (videoRef.current) {
+      applyVideoFilter(videoRef.current, isBW);
+    }
+  }, [isBW]);
+
+  // Navigation functions
+  const goHome = useCallback(() => {
+    cleanupCamera();
     resetAll();
     setCurrentScreen('home');
-  }
+  }, [cleanupCamera]);
 
-  function goToBooth() {
+  const goToBooth = useCallback(() => {
     resetAll();
     setCurrentScreen('booth');
-  }
+  }, []);
 
-  function toggleBW(checked: boolean) {
-    setIsBW(checked);
-    if (videoRef.current) {
-      videoRef.current.style.filter = checked ? 'grayscale(1) contrast(1.1)' : '';
-    }
-  }
-
-  function resetAll() {
-    setPhotos([null, null, null, null]);
-    setFilteredPhotos([null, null, null, null]);
-    setShooting(false);
+  const resetAll = useCallback(() => {
+    setPhotos(Array(PHOTO_COUNT).fill(null));
+    setFilteredPhotos(Array(PHOTO_COUNT).fill(null));
+    setIsCapturing(false);
     setIsBW(false);
     setCurrentFilter('none');
     setShowPrinting(false);
     setShowFinalKiosk(false);
-  }
+    setCurrentFrameIndex(0);
+    setCurrentPhotoIndex(0);
+  }, []);
 
-  async function startSession() {
-    if (shooting) return;
-    setShooting(true);
-    setPhotos([null, null, null, null]);
-    const newPhotos: (string | null)[] = [null, null, null, null];
+  // B&W toggle
+  const toggleBW = useCallback((checked: boolean) => {
+    setIsBW(checked);
+  }, []);
 
-    for (let i = 0; i < 4; i++) {
-      if (i > 0) {
-        moveLiveToCell(i);
+  // Photo capture sequence
+  const startPhotoSession = useCallback(async () => {
+    if (isCapturing || !stream || !videoRef.current || !canvasRef.current) {
+      console.log('Cannot start capture:', {
+        isCapturing,
+        hasStream: !!stream,
+        hasVideo: !!videoRef.current,
+        hasCanvas: !!canvasRef.current
+      });
+      return;
+    }
+    
+    setIsCapturing(true);
+    setCurrentPhotoIndex(0);
+    
+    // Create array to hold all photos
+    const capturedPhotos: string[] = [];
+
+    for (let i = 0; i < PHOTO_COUNT; i++) {
+      setCurrentPhotoIndex(i);
+      
+      console.log(`Starting photo ${i + 1}/${PHOTO_COUNT}`);
+      
+      // Countdown
+      await showCountdown(i);
+      
+      // Wait a tiny bit after countdown for stability
+      await delay(100);
+      
+      // Capture photo
+      const photo = captureVideoFrame(videoRef.current, canvasRef.current, { isBW });
+      console.log(`Photo ${i + 1} captured:`, photo ? 'Success' : 'FAILED');
+      
+      if (photo) {
+        capturedPhotos.push(photo);
+        // Update state immediately with current photos
+        const updatedPhotos = [...capturedPhotos];
+        while (updatedPhotos.length < PHOTO_COUNT) {
+          updatedPhotos.push(null);
+        }
+        setPhotos(updatedPhotos);
+      } else {
+        console.error(`Failed to capture photo ${i + 1}`);
       }
-      await countdownInCell(i, 3);
-      const captured = captureCell();
-      if (captured !== null) {
-        newPhotos[i] = captured as string;
-      }
+      
+      // Flash effect
       triggerFlash(i);
-      await delay(700);
-    }
-
-    setPhotos(newPhotos);
-    setShooting(false);
-    await delay(300);
-    await showResult();
-  }
-
-  function moveLiveToCell(index: number) {
-    if (videoRef.current && cellRefsArray.current[index]) {
-      const cell = cellRefsArray.current[index];
-      if (!cell.querySelector('video')) {
-        const video = document.createElement('video');
-        video.autoplay = true;
-        video.playsInline = true;
-        video.muted = true;
-        video.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)';
-        if (isBW) {
-          video.style.filter = 'grayscale(1) contrast(1.1)';
-        }
-        if (stream) {
-          video.srcObject = stream;
-        }
-        cell.appendChild(video);
+      
+      // Delay before next photo
+      if (i < PHOTO_COUNT - 1) {
+        await delay(CAPTURE_DELAY_MS);
       }
     }
-  }
 
-  function countdownInCell(index: number, secs: number): Promise<void> {
+    console.log(`Capture complete! Total photos: ${capturedPhotos.length}`);
+    setIsCapturing(false);
+    await delay(500);
+    
+    // Only go to frame selection if we have photos
+    if (capturedPhotos.length > 0) {
+      cleanupCamera();
+      setCurrentScreen('frameSelection');
+    } else {
+      console.error('No photos captured! Staying on booth screen');
+      setIsCapturing(false);
+    }
+  }, [isCapturing, stream, isBW, cleanupCamera]);
+
+  // Countdown animation
+  const showCountdown = async (photoIndex: number): Promise<void> => {
     return new Promise((resolve) => {
-      const el = document.getElementById(`cdown-${index}`);
-      if (!el) {
+      const countdownEl = document.getElementById(`countdown-${photoIndex}`);
+      if (!countdownEl) {
         resolve();
         return;
       }
-      let n = secs;
-      el.textContent = String(n);
-      el.classList.add('show');
+
+      let count = COUNTDOWN_SECONDS;
+      countdownEl.textContent = String(count);
+      countdownEl.style.opacity = '1';
+
       const interval = setInterval(() => {
-        n--;
-        if (n <= 0) {
+        count--;
+        if (count <= 0) {
           clearInterval(interval);
-          el.classList.remove('show');
+          countdownEl.style.opacity = '0';
           resolve();
         } else {
-          el.textContent = String(n);
+          countdownEl.textContent = String(count);
         }
       }, 1000);
     });
-  }
+  };
 
-  function captureCell(): string | null {
-    if (!videoRef.current || !canvasRef.current) return null;
-    const url = captureVideoFrame(videoRef.current, canvasRef.current, { isBW });
-    return url;
-  }
-
-  function triggerFlash(index: number) {
-    const el = document.getElementById(`flash-${index}`);
-    if (el) {
-      el.classList.add('flashing');
-      setTimeout(() => el.classList.remove('flashing'), 120);
+  // Flash effect
+  const triggerFlash = (photoIndex: number) => {
+    const flashEl = document.getElementById(`flash-${photoIndex}`);
+    if (flashEl) {
+      flashEl.style.opacity = '1';
+      setTimeout(() => {
+        flashEl.style.opacity = '0';
+      }, FLASH_DURATION_MS);
     }
-  }
+  };
 
-  async function showResult() {
-    stopCamera();
-    setCurrentScreen('result');
-    setShowFinalKiosk(false);
-    setShowPrinting(true);
-    await delay(1800);
-    setShowPrinting(false);
-    applyFilter('none');
-    setShowFinalKiosk(true);
-  }
+  // Upload photos
+  const handleUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []).slice(0, PHOTO_COUNT);
+    if (files.length === 0) return;
 
-  function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files || []).slice(0, 4);
-    let done = 0;
     const newPhotos = [...photos];
+    let loadedCount = 0;
 
-    files.forEach((file, idx) => {
+    files.forEach((file, index) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        newPhotos[idx] = result;
-        done++;
-        if (done === files.length) {
+        newPhotos[index] = result;
+        loadedCount++;
+        
+        if (loadedCount === files.length) {
           setPhotos(newPhotos);
-          setTimeout(() => showResult(), 600);
+          setTimeout(() => {
+            cleanupCamera();
+            setCurrentScreen('frameSelection');
+          }, 300);
         }
       };
       reader.readAsDataURL(file);
     });
+
     event.target.value = '';
-  }
+  }, [photos, cleanupCamera]);
 
-  function applyFilter(filterName: FilterName, btn?: HTMLButtonElement) {
+  // Frame selection
+  const handleFrameChange = useCallback((index: number) => {
+    setCurrentFrameIndex(index);
+  }, []);
+
+  const handleSelectFrame = useCallback(async () => {
+    setCurrentScreen('result');
+    setShowFinalKiosk(false);
+    setShowPrinting(true);
+    
+    await delay(PRINTING_ANIMATION_MS);
+    
+    setShowPrinting(false);
+    setShowFinalKiosk(true);
+    
+    // Apply initial filter (none)
+    applyFilter('none');
+  }, []);
+
+  // Filter application
+  const applyFilter = useCallback((filterName: FilterName) => {
     setCurrentFilter(filterName);
-    if (btn) {
-      document.querySelectorAll('.filter-chip').forEach((c) => c.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    const newFiltered = [...filteredPhotos];
-    photos.forEach((photo, i) => {
-      if (!photo) {
-        newFiltered[i] = null;
-        return;
-      }
-      filterImageData(photo, filterName, (result) => {
-        newFiltered[i] = result;
-        setFilteredPhotos([...newFiltered]);
-      });
+    
+    batchFilterImages(photos, filterName, (results) => {
+      setFilteredPhotos(results);
     });
-  }
+  }, [photos]);
 
-  const cells = photos.map((src, i) => ({
-    type: (src ? 'filled' : currentScreen === 'booth' && i === 0 ? 'live' : 'empty') as 'live' | 'empty' | 'filled',
-    src: src || undefined,
-    index: i,
-  }));
+  // Download
+  const handleDownload = useCallback(() => {
+    const photosToDownload = filteredPhotos.some(p => p !== null) ? filteredPhotos : photos;
+    downloadCompositeImage(photosToDownload);
+  }, [filteredPhotos, photos]);
+
+  // Modal
+  const handleImageClick = useCallback((src: string) => {
+    setModalImage(src);
+    setModalOpen(true);
+  }, []);
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-bg">
+    <div className="w-screen h-screen overflow-hidden bg-white">
       <canvas ref={canvasRef} className="hidden" />
 
       {currentScreen === 'home' && <HomeScreen onEnter={goToBooth} />}
@@ -238,34 +339,46 @@ export default function Home() {
         <BoothScreen
           isBW={isBW}
           onBWToggle={toggleBW}
-          onRecordClick={startSession}
+          onRecordClick={startPhotoSession}
           onUpload={handleUpload}
           onHome={goHome}
-          recordDisabled={shooting || !stream}
+          recordDisabled={!stream || isCapturing}
           videoRef={videoRef}
-          cells={cells}
-          cellRefs={cellRefsArray}
+          photos={photos}
+          currentPhotoIndex={currentPhotoIndex}
+          isCapturing={isCapturing}
+        />
+      )}
+
+      {currentScreen === 'frameSelection' && (
+        <FrameSelection
+          photos={photos}
+          currentFrameIndex={currentFrameIndex}
+          onFrameChange={handleFrameChange}
+          onSelectFrame={handleSelectFrame}
+          onHome={goHome}
         />
       )}
 
       {currentScreen === 'result' && (
         <ResultScreen
-          photos={filteredPhotos.map((f, i) => f || photos[i])}
+          photos={filteredPhotos.some(p => p !== null) ? filteredPhotos : photos}
           showPrinting={showPrinting}
           showFinalKiosk={showFinalKiosk}
           currentFilter={currentFilter}
-          onFilterClick={(filter, el) => applyFilter(filter as FilterName, el)}
-          onDownload={() => downloadCompositeImage(filteredPhotos.map((f, i) => f || photos[i]))}
+          onFilterChange={applyFilter}
+          onDownload={handleDownload}
           onRetake={goToBooth}
           onHome={goHome}
-          onImageClick={(src) => {
-            setModalImage(src);
-            setModalOpen(true);
-          }}
+          onImageClick={handleImageClick}
         />
       )}
 
-      <Modal isOpen={modalOpen} imageSrc={modalImage} onClose={() => setModalOpen(false)} />
+      <Modal
+        isOpen={modalOpen}
+        imageSrc={modalImage}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }

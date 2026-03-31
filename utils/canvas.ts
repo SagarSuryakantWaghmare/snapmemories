@@ -39,12 +39,12 @@ export function captureVideoFrame(
 }
 
 export function downloadCompositeImage(images: (string | null)[]): void {
-  const cellWidth = 320;
+  const cellWidth = 240;
   const cellHeight = 240;
   const gap = 4;
   const padding = 14;
-  const totalWidth = cellWidth * 2 + gap + padding * 2;
-  const totalHeight = cellHeight * 2 + gap + padding * 2 + 24;
+  const totalWidth = cellWidth + padding * 2;
+  const totalHeight = cellHeight * 4 + gap * 3 + padding * 2 + 24;
 
   const canvas = document.createElement('canvas');
   canvas.width = totalWidth;
@@ -56,13 +56,13 @@ export function downloadCompositeImage(images: (string | null)[]): void {
   ctx.fillStyle = '#111111';
   ctx.fillRect(0, 0, totalWidth, totalHeight);
 
-  // Load and draw images
+  // Load and draw images (1x4 vertical strip)
   let loaded = 0;
   const positions = [
     [0, 0],
-    [1, 0],
     [0, 1],
-    [1, 1],
+    [0, 2],
+    [0, 3],
   ];
 
   positions.forEach(([col, row], i) => {
@@ -98,11 +98,11 @@ function addFooterAndDownload(
   ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
   ctx.font = '12px monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('© 2025 Sagar Suryakant Waghmare · mysketchbooth', totalWidth / 2, totalHeight - 8);
+  ctx.fillText('© 2025 Snap Memories · snapmemories.app', totalWidth / 2, totalHeight - 8);
 
   // Trigger download
   const link = document.createElement('a');
-  link.download = `mysketchbooth-${Date.now()}.jpg`;
+  link.download = `snap-memories-${Date.now()}.jpg`;
   link.href = canvas.toDataURL('image/jpeg', 0.92);
   link.click();
 }
