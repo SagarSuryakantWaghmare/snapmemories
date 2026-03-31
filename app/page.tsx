@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import HomeScreen from '@/components/HomeScreen';
+import TemplateSelection from '@/components/TemplateSelection';
 import BoothScreen from '@/components/BoothScreen';
 import FrameSelection from '@/components/FrameSelection';
 import ResultScreen from '@/components/ResultScreen';
 import Modal from '@/components/Modal';
 import { Screen, FilterName } from '@/lib/types';
+import { PhotoStripTemplate, PHOTO_STRIP_TEMPLATES, DEFAULT_TEMPLATE } from '@/lib/templates';
 import { startCamera, stopCamera, captureVideoFrame, applyVideoFilter } from '@/lib/camera';
 import { downloadCompositeImage, delay } from '@/lib/canvas';
 import { batchFilterImages } from '@/lib/filters';
@@ -15,6 +17,9 @@ import { PHOTO_COUNT, COUNTDOWN_SECONDS, FLASH_DURATION_MS, CAPTURE_DELAY_MS, PR
 export default function Home() {
   // Screen navigation
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
+  
+  // Template selection
+  const [selectedTemplate, setSelectedTemplate] = useState<PhotoStripTemplate>(DEFAULT_TEMPLATE);
   
   // Photo state
   const [photos, setPhotos] = useState<(string | null)[]>(Array(PHOTO_COUNT).fill(null));
@@ -52,6 +57,13 @@ export default function Home() {
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         
+        // Explicitly play the video
+        try {
+          await videoRef.current.play();
+        } catch (playError) {
+          console.warn('Video play() called but may already be playing:', playError);
+        }
+        
         // Wait for video to be ready
         await new Promise<void>((resolve) => {
           const video = videoRef.current;
@@ -72,7 +84,8 @@ export default function Home() {
             console.log('Video loaded and ready', {
               videoWidth: video.videoWidth,
               videoHeight: video.videoHeight,
-              readyState: video.readyState
+              readyState: video.readyState,
+              paused: video.paused
             });
             video.removeEventListener('loadeddata', onLoadedData);
             resolve();
@@ -320,8 +333,8 @@ export default function Home() {
   // Download
   const handleDownload = useCallback(() => {
     const photosToDownload = filteredPhotos.some(p => p !== null) ? filteredPhotos : photos;
-    downloadCompositeImage(photosToDownload);
-  }, [filteredPhotos, photos]);
+    downloadCompositeImage(photosToDownload, selectedTemplate);
+  }, [filteredPhotos, photos, selectedTemplate]);
 
   // Modal
   const handleImageClick = useCallback((src: string) => {
@@ -333,7 +346,16 @@ export default function Home() {
     <div className="w-screen h-screen overflow-hidden bg-white">
       <canvas ref={canvasRef} className="hidden" />
 
-      {currentScreen === 'home' && <HomeScreen onEnter={goToBooth} />}
+      {currentScreen === 'home' && <HomeScreen onEnter={goToTemplateSelection} />}
+
+      {currentScreen === 'templateSelection' && (
+        <TemplateSelection
+          templates={PHOTO_STRIP_TEMPLATES}
+          selectedTemplate={selectedTemplate}
+          onSelectTemplate={setSelectedTemplate}
+          onContinue={goToBooth}
+        />
+      )}
 
       {currentScreen === 'booth' && (
         <BoothScreen

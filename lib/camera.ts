@@ -41,9 +41,9 @@ export function captureVideoFrame(
     return null;
   }
 
-  // Check if video is ready
+  // Check if video has metadata loaded
   if (!video.videoWidth || !video.videoHeight) {
-    console.error('captureVideoFrame: Video not ready', {
+    console.error('captureVideoFrame: Video metadata not loaded', {
       videoWidth: video.videoWidth,
       videoHeight: video.videoHeight,
       readyState: video.readyState,
@@ -52,12 +52,13 @@ export function captureVideoFrame(
     return null;
   }
 
-  // Check if video is playing
-  if (video.paused || video.ended || video.readyState < 2) {
-    console.error('captureVideoFrame: Video not playing', {
-      paused: video.paused,
-      ended: video.ended,
-      readyState: video.readyState
+  // Check readyState - must have current data
+  if (video.readyState < 2) {
+    console.error('captureVideoFrame: Video not ready (readyState < 2)', {
+      readyState: video.readyState,
+      HAVE_NOTHING: 0,
+      HAVE_METADATA: 1,
+      HAVE_CURRENT_DATA: 2
     });
     return null;
   }

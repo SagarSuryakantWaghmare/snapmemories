@@ -1,6 +1,6 @@
 // Type definitions for Photo Booth application
 
-export type Screen = 'home' | 'booth' | 'frameSelection' | 'result';
+export type Screen = 'home' | 'templateSelection' | 'booth' | 'frameSelection' | 'result';
 
 export type FilterName = 'none' | 'bw' | 'warm' | 'cool' | 'vintage' | 'bold';
 
