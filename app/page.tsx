@@ -146,6 +146,10 @@ export default function Home() {
     setCurrentScreen('home');
   }, [cleanupCamera]);
 
+  const goToTemplateSelection = useCallback(() => {
+    setCurrentScreen('templateSelection');
+  }, []);
+
   const goToBooth = useCallback(() => {
     resetAll();
     setCurrentScreen('booth');
@@ -354,6 +358,7 @@ export default function Home() {
           selectedTemplate={selectedTemplate}
           onSelectTemplate={setSelectedTemplate}
           onContinue={goToBooth}
+          onHome={goHome}
         />
       )}
 

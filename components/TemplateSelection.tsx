@@ -1,12 +1,14 @@
 'use client';
 
 import { PhotoStripTemplate } from '@/lib/templates';
+import FloatingNav from './FloatingNav';
 
 interface TemplateSelectionProps {
   templates: PhotoStripTemplate[];
   selectedTemplate: PhotoStripTemplate;
   onSelectTemplate: (template: PhotoStripTemplate) => void;
   onContinue: () => void;
+  onHome?: () => void;
 }
 
 export default function TemplateSelection({
@@ -14,21 +16,24 @@ export default function TemplateSelection({
   selectedTemplate,
   onSelectTemplate,
   onContinue,
+  onHome,
 }: TemplateSelectionProps) {
   return (
-    <div className="w-screen h-screen bg-gray-50 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="h-20 border-b-2 border-black bg-white flex items-center justify-center shrink-0">
+    <div className="w-screen h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col overflow-hidden">
+      {/* Floating Navigation */}
+      <FloatingNav showBack={!!onHome} onBack={onHome} />
+
+      {/* Title */}
+      <div className="pt-8 pb-4 text-center shrink-0">
         <h1 className="text-2xl md:text-3xl font-bold text-black">Choose Your Style</h1>
+        <p className="text-sm md:text-base text-gray-500 mt-2">
+          Select a photo strip template to personalize your photos
+        </p>
       </div>
 
       {/* Template Grid */}
       <div className="flex-1 overflow-auto p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
-          <p className="text-center text-gray-600 mb-6 md:mb-8 text-sm md:text-base">
-            Select a photo strip template to personalize your photos
-          </p>
-
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {templates.map((template) => {
               const isSelected = selectedTemplate.id === template.id;
@@ -170,16 +175,22 @@ export default function TemplateSelection({
             })}
           </div>
 
-          {/* Continue Button */}
-          <div className="mt-8 flex justify-center">
-            <button
-              onClick={onContinue}
-              className="px-8 md:px-12 py-3 md:py-4 bg-black text-white text-base md:text-lg font-bold rounded-lg hover:bg-gray-800 transition-colors shadow-lg"
-            >
-              Continue to Booth →
-            </button>
-          </div>
+          {/* Spacer for floating button */}
+          <div className="h-24" />
         </div>
+      </div>
+
+      {/* Floating Continue Button */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+        <button
+          onClick={onContinue}
+          className="px-10 md:px-14 py-4 md:py-5 bg-black text-white text-base md:text-lg font-bold rounded-full 
+                     hover:bg-gray-800 active:scale-95 
+                     transition-all duration-150 
+                     shadow-2xl hover:shadow-3xl"
+        >
+          Continue to Booth →
+        </button>
       </div>
     </div>
   );

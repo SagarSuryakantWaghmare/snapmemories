@@ -4,7 +4,9 @@ export type Screen = 'home' | 'templateSelection' | 'booth' | 'frameSelection' |
 
 export type FilterName = 'none' | 'bw' | 'warm' | 'cool' | 'vintage' | 'bold';
 
-export type FrameType = 'classic' | 'modern' | 'vintage' | 'polaroid';
+export type FrameShape = 'heart' | 'circle' | 'polaroid' | 'rectangle';
+
+export type FrameType = 'heart-pink' | 'circle-black' | 'polaroid-white' | 'polaroid-orange' | 'bold-black' | 'dark-elegant';
 
 export interface Photo {
   id: number;
@@ -16,6 +18,10 @@ export interface Frame {
   id: FrameType;
   name: string;
   price: number;
+  shape: FrameShape;
+  borderColor: string;
+  borderWidth: number;
+  backgroundColor: string;
 }
 
 export interface CaptureOptions {

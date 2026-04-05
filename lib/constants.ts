@@ -19,10 +19,60 @@ export const FILTERS: { name: string; value: FilterName }[] = [
 ];
 
 export const FRAMES: Frame[] = [
-  { id: 'classic', name: 'Classic', price: 0 },
-  { id: 'modern', name: 'Modern', price: 0 },
-  { id: 'vintage', name: 'Vintage', price: 0 },
-  { id: 'polaroid', name: 'Polaroid', price: 0 },
+  { 
+    id: 'heart-pink', 
+    name: 'Heart Pink', 
+    price: 0,
+    shape: 'heart',
+    borderColor: '#FF69B4',
+    borderWidth: 4,
+    backgroundColor: '#FFF0F5'
+  },
+  { 
+    id: 'circle-black', 
+    name: 'Circle Classic', 
+    price: 0,
+    shape: 'circle',
+    borderColor: '#000000',
+    borderWidth: 3,
+    backgroundColor: '#FFFFFF'
+  },
+  { 
+    id: 'polaroid-white', 
+    name: 'Polaroid White', 
+    price: 0,
+    shape: 'polaroid',
+    borderColor: '#E5E5E5',
+    borderWidth: 16,
+    backgroundColor: '#FFFFFF'
+  },
+  { 
+    id: 'polaroid-orange', 
+    name: 'Polaroid Orange', 
+    price: 0,
+    shape: 'polaroid',
+    borderColor: '#FF8C00',
+    borderWidth: 16,
+    backgroundColor: '#FFF8F0'
+  },
+  { 
+    id: 'bold-black', 
+    name: 'Bold Black', 
+    price: 0,
+    shape: 'rectangle',
+    borderColor: '#000000',
+    borderWidth: 6,
+    backgroundColor: '#FFFFFF'
+  },
+  { 
+    id: 'dark-elegant', 
+    name: 'Dark Elegant', 
+    price: 0,
+    shape: 'rectangle',
+    borderColor: '#2D2D2D',
+    borderWidth: 8,
+    backgroundColor: '#1A1A1A'
+  },
 ];
 
 export const PHOTO_COUNT = 4;
