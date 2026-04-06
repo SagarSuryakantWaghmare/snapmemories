@@ -347,7 +347,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-white">
+    <div className="w-full h-screen overflow-hidden bg-white">
       <canvas ref={canvasRef} className="hidden" />
 
       {currentScreen === 'home' && <HomeScreen onEnter={goToTemplateSelection} />}
