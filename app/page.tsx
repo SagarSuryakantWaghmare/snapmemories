@@ -46,7 +46,7 @@ export default function Home() {
   const [modalImage, setModalImage] = useState<string | null>(null);
   
   // Refs
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null!);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Camera management
@@ -139,6 +139,19 @@ export default function Home() {
     }
   }, [isBW]);
 
+  // Reset all state
+  const resetAll = useCallback(() => {
+    setPhotos(Array(PHOTO_COUNT).fill(null));
+    setFilteredPhotos(Array(PHOTO_COUNT).fill(null));
+    setIsCapturing(false);
+    setIsBW(false);
+    setCurrentFilter('none');
+    setShowPrinting(false);
+    setShowFinalKiosk(false);
+    setCurrentFrameIndex(0);
+    setCurrentPhotoIndex(0);
+  }, []);
+
   // Navigation functions
   const goHome = useCallback(() => {
     cleanupCamera();
@@ -154,18 +167,6 @@ export default function Home() {
     resetAll();
     setCurrentScreen('booth');
   }, [resetAll]);
-
-  const resetAll = useCallback(() => {
-    setPhotos(Array(PHOTO_COUNT).fill(null));
-    setFilteredPhotos(Array(PHOTO_COUNT).fill(null));
-    setIsCapturing(false);
-    setIsBW(false);
-    setCurrentFilter('none');
-    setShowPrinting(false);
-    setShowFinalKiosk(false);
-    setCurrentFrameIndex(0);
-    setCurrentPhotoIndex(0);
-  }, []);
 
   // B&W toggle
   const toggleBW = useCallback((checked: boolean) => {
@@ -208,7 +209,7 @@ export default function Home() {
       if (photo) {
         capturedPhotos.push(photo);
         // Update state immediately with current photos
-        const updatedPhotos = [...capturedPhotos];
+        const updatedPhotos: (string | null)[] = [...capturedPhotos];
         while (updatedPhotos.length < PHOTO_COUNT) {
           updatedPhotos.push(null);
         }
@@ -311,6 +312,15 @@ export default function Home() {
     setCurrentFrameIndex(index);
   }, []);
 
+  // Filter application
+  const applyFilter = useCallback((filterName: FilterName) => {
+    setCurrentFilter(filterName);
+    
+    batchFilterImages(photos, filterName, (results) => {
+      setFilteredPhotos(results);
+    });
+  }, [photos]);
+
   const handleSelectFrame = useCallback(async () => {
     setCurrentScreen('result');
     setShowFinalKiosk(false);
@@ -324,15 +334,6 @@ export default function Home() {
     // Apply initial filter (none)
     applyFilter('none');
   }, [applyFilter]);
-
-  // Filter application
-  const applyFilter = useCallback((filterName: FilterName) => {
-    setCurrentFilter(filterName);
-    
-    batchFilterImages(photos, filterName, (results) => {
-      setFilteredPhotos(results);
-    });
-  }, [photos]);
 
   // Download
   const handleDownload = useCallback(() => {
