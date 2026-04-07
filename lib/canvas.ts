@@ -139,7 +139,7 @@ function addTemplateDecorationsAndDownload(
   totalHeight: number,
   template?: PhotoStripTemplate
 ): void {
-  const { padding, footerHeight } = DOWNLOAD_IMAGE_CONFIG;
+  const { footerHeight } = DOWNLOAD_IMAGE_CONFIG;
   
   // Apply decorations
   if (template) {

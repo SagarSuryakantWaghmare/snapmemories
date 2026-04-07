@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ResultScreenProps } from '@/lib/types';
 import { FILTERS } from '@/lib/constants';
 import FloatingNav from './FloatingNav';
@@ -82,10 +83,11 @@ export default function ResultScreen({
                     style={{ width: '100%', aspectRatio: '1/1' }}
                   >
                     {photo ? (
-                      <img
+                      <Image
                         src={photo}
                         alt={`Photo ${i + 1}`}
-                        className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                        fill
+                        className="object-cover hover:opacity-90 transition-opacity"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400">

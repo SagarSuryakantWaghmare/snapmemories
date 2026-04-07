@@ -130,7 +130,7 @@ export default function Home() {
         cleanupCamera();
       }
     };
-  }, [currentScreen]); // Only depend on currentScreen
+  }, [currentScreen, initCamera, cleanupCamera]);
 
   // Apply B&W filter to video
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function Home() {
     cleanupCamera();
     resetAll();
     setCurrentScreen('home');
-  }, [cleanupCamera]);
+  }, [cleanupCamera, resetAll]);
 
   const goToTemplateSelection = useCallback(() => {
     setCurrentScreen('templateSelection');
@@ -153,7 +153,7 @@ export default function Home() {
   const goToBooth = useCallback(() => {
     resetAll();
     setCurrentScreen('booth');
-  }, []);
+  }, [resetAll]);
 
   const resetAll = useCallback(() => {
     setPhotos(Array(PHOTO_COUNT).fill(null));
@@ -323,7 +323,7 @@ export default function Home() {
     
     // Apply initial filter (none)
     applyFilter('none');
-  }, []);
+  }, [applyFilter]);
 
   // Filter application
   const applyFilter = useCallback((filterName: FilterName) => {

@@ -2,6 +2,7 @@
 
 import { FrameSelectionProps, Frame } from '@/lib/types';
 import { FRAMES } from '@/lib/constants';
+import Image from 'next/image';
 import FloatingNav from './FloatingNav';
 
 export default function FrameSelection({
@@ -70,7 +71,7 @@ export default function FrameSelection({
           }}
         >
           {photoPreview ? (
-            <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+            <Image src={photoPreview} alt="Preview" fill className="object-cover" />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
               <span className="text-gray-400 text-lg">📷</span>
@@ -94,7 +95,7 @@ export default function FrameSelection({
         >
           <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-200 overflow-hidden">
             {photoPreview ? (
-              <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+              <Image src={photoPreview} alt="Preview" fill className="object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <span className="text-gray-400 text-lg">📷</span>
@@ -115,7 +116,7 @@ export default function FrameSelection({
         }}
       >
         {photoPreview ? (
-          <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+          <Image src={photoPreview} alt="Preview" fill className="object-cover" />
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <span className="text-gray-400 text-lg">📷</span>
@@ -179,7 +180,7 @@ export default function FrameSelection({
                   }}
                 >
                   {photo ? (
-                    <img src={photo} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                    <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
                       <span className="text-xs">{i + 1}</span>

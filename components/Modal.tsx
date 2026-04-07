@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ModalProps } from '@/lib/types';
 
 export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
@@ -14,9 +15,11 @@ export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
         className="bg-white border-3 border-black rounded-lg p-3 md:p-4 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
+        <Image
           src={imageSrc}
           alt="Enlarged photo"
+          width={800}
+          height={600}
           className="w-full h-auto rounded"
         />
         <button

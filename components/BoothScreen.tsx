@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { BoothScreenProps } from '@/lib/types';
 
 export default function BoothScreen({
@@ -12,7 +13,6 @@ export default function BoothScreen({
   recordDisabled,
   videoRef,
   photos,
-  currentPhotoIndex,
   isCapturing,
 }: BoothScreenProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +44,7 @@ export default function BoothScreen({
     const timer = setTimeout(updatePreviewStreams, 100);
     
     return () => clearTimeout(timer);
-  }, [videoRef.current?.srcObject]);
+  }, [videoRef]);
 
   return (
     <div className="w-full h-full min-h-screen bg-white flex flex-col overflow-hidden relative">
@@ -168,10 +168,11 @@ export default function BoothScreen({
                   
                   {/* Captured photo */}
                   {photos[index] && (
-                    <img
+                    <Image
                       src={photos[index]!}
                       alt={`Photo ${index + 1}`}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   )}
 
