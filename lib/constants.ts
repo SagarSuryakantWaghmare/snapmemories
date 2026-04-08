@@ -101,5 +101,5 @@ export const DOWNLOAD_IMAGE_CONFIG = {
   cellHeight: 240,
   gap: 4,
   padding: 14,
-  footerHeight: 24,
+  footerHeight: 40,
 } as const;

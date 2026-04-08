@@ -21,18 +21,29 @@ export default function BoothScreen({
 
   // Mirror the videoRef stream to the preview videos
   useEffect(() => {
-    const updatePreviewStreams = () => {
+    let mounted = true;
+
+    const updatePreviewStreams = async () => {
+      if (!mounted) return;
       if (videoRef.current?.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         
         if (previewVideoRef.current && previewVideoRef.current.srcObject !== stream) {
           previewVideoRef.current.srcObject = stream;
-          previewVideoRef.current.play().catch(e => console.log('Preview play error:', e));
+          try {
+            await previewVideoRef.current.play();
+          } catch {
+            // Silent fail - browser may block autoplay
+          }
         }
         
         if (mobilePreviewRef.current && mobilePreviewRef.current.srcObject !== stream) {
           mobilePreviewRef.current.srcObject = stream;
-          mobilePreviewRef.current.play().catch(e => console.log('Mobile preview play error:', e));
+          try {
+            await mobilePreviewRef.current.play();
+          } catch {
+            // Silent fail - browser may block autoplay
+          }
         }
       }
     };
@@ -41,9 +52,16 @@ export default function BoothScreen({
     updatePreviewStreams();
     
     // Also update on a slight delay to catch stream updates
-    const timer = setTimeout(updatePreviewStreams, 100);
+    const timer = setTimeout(updatePreviewStreams, 200);
     
-    return () => clearTimeout(timer);
+    // Also update periodically to ensure video stays playing
+    const interval = setInterval(updatePreviewStreams, 1000);
+    
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, [videoRef]);
 
   return (
@@ -199,7 +217,7 @@ export default function BoothScreen({
             </div>
             {/* Branding */}
             <p className="text-[7px] sm:text-[8px] text-center text-gray-400 mt-1 tracking-wider">
-              snapmemoriesbysagar
+              snapmemories by sagar
             </p>
           </div>
         </div>

@@ -99,7 +99,7 @@ export default function ResultScreen({
               </div>
               {/* Branding inside the frame */}
               <p className="text-[8px] sm:text-[9px] text-center text-gray-400 mt-1.5 tracking-wider">
-                snapmemoriesbysagar
+                snapmemories by sagar
               </p>
             </div>
 

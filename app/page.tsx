@@ -12,7 +12,7 @@ import { PhotoStripTemplate, PHOTO_STRIP_TEMPLATES, DEFAULT_TEMPLATE } from '@/l
 import { startCamera, stopCamera, captureVideoFrame, applyVideoFilter } from '@/lib/camera';
 import { downloadCompositeImage, delay } from '@/lib/canvas';
 import { batchFilterImages } from '@/lib/filters';
-import { PHOTO_COUNT, COUNTDOWN_SECONDS, FLASH_DURATION_MS, CAPTURE_DELAY_MS, PRINTING_ANIMATION_MS } from '@/lib/constants';
+import { PHOTO_COUNT, COUNTDOWN_SECONDS, FLASH_DURATION_MS, CAPTURE_DELAY_MS, PRINTING_ANIMATION_MS, FRAMES } from '@/lib/constants';
 
 export default function Home() {
   // Screen navigation
@@ -55,49 +55,64 @@ export default function Home() {
       const mediaStream = await startCamera();
       setStream(mediaStream);
       if (videoRef.current) {
+        // Set srcObject first
         videoRef.current.srcObject = mediaStream;
         
-        // Explicitly play the video
+        // Ensure video plays
         try {
           await videoRef.current.play();
         } catch (playError) {
-          console.warn('Video play() called but may already be playing:', playError);
+          console.log('Auto-play blocked, user interaction may be required:', playError);
         }
-        
-        // Wait for video to be ready
+
+        // Wait for video to be ready for capture
         await new Promise<void>((resolve) => {
           const video = videoRef.current;
           if (!video) {
             resolve();
             return;
           }
-          
-          // If video is already ready, resolve immediately
-          if (video.readyState >= 2) {
-            console.log('Video already ready');
-            resolve();
-            return;
-          }
-          
-          // Wait for loadeddata event
-          const onLoadedData = () => {
-            console.log('Video loaded and ready', {
-              videoWidth: video.videoWidth,
-              videoHeight: video.videoHeight,
-              readyState: video.readyState,
-              paused: video.paused
-            });
-            video.removeEventListener('loadeddata', onLoadedData);
-            resolve();
+
+          let timeoutId: ReturnType<typeof setTimeout> | null = null;
+          let resolved = false;
+
+          // Set up ready state check
+          const checkReady = () => {
+            if (resolved) return;
+            if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
+              console.log('Video ready for capture', {
+                videoWidth: video.videoWidth,
+                videoHeight: video.videoHeight,
+                readyState: video.readyState,
+              });
+              resolved = true;
+              video.removeEventListener('loadeddata', checkReady);
+              video.removeEventListener('canplay', checkReady);
+              video.removeEventListener('playing', checkReady);
+              if (timeoutId !== null) {
+                clearTimeout(timeoutId);
+              }
+              resolve();
+            }
           };
+
+          video.addEventListener('loadeddata', checkReady);
+          video.addEventListener('canplay', checkReady);
+          video.addEventListener('playing', checkReady);
           
-          video.addEventListener('loadeddata', onLoadedData);
-          
+          // Check immediately in case already ready
+          checkReady();
+
           // Fallback timeout
-          setTimeout(() => {
-            console.log('Video load timeout, continuing anyway');
-            video.removeEventListener('loadeddata', onLoadedData);
-            resolve();
+          timeoutId = setTimeout(() => {
+            if (!resolved) {
+              console.log('Video initialization timeout, continuing anyway');
+              resolved = true;
+              video.removeEventListener('loadeddata', checkReady);
+              video.removeEventListener('canplay', checkReady);
+              video.removeEventListener('playing', checkReady);
+              resolve();
+            }
           }, 5000);
         });
       }
@@ -199,12 +214,22 @@ export default function Home() {
       // Countdown
       await showCountdown(i);
       
-      // Wait a tiny bit after countdown for stability
-      await delay(100);
+      // Wait and ensure video is ready after countdown
+      await delay(200);
       
-      // Capture photo
-      const photo = captureVideoFrame(videoRef.current, canvasRef.current, { isBW });
-      console.log(`Photo ${i + 1} captured:`, photo ? 'Success' : 'FAILED');
+      // Retry capture if video not immediately ready
+      let photo: string | null = null;
+      for (let retryCount = 0; retryCount < 3; retryCount++) {
+        photo = captureVideoFrame(videoRef.current, canvasRef.current, { isBW });
+        if (photo) {
+          console.log(`Photo ${i + 1} captured successfully on attempt ${retryCount + 1}`);
+          break;
+        }
+        if (retryCount < 2) {
+          console.warn(`Photo ${i + 1} capture failed, retrying...`);
+          await delay(100);
+        }
+      }
       
       if (photo) {
         capturedPhotos.push(photo);
@@ -215,7 +240,7 @@ export default function Home() {
         }
         setPhotos(updatedPhotos);
       } else {
-        console.error(`Failed to capture photo ${i + 1}`);
+        console.error(`Failed to capture photo ${i + 1} after 3 attempts`);
       }
       
       // Flash effect
@@ -338,8 +363,9 @@ export default function Home() {
   // Download
   const handleDownload = useCallback(() => {
     const photosToDownload = filteredPhotos.some(p => p !== null) ? filteredPhotos : photos;
-    downloadCompositeImage(photosToDownload, selectedTemplate);
-  }, [filteredPhotos, photos, selectedTemplate]);
+    const selectedFrame = FRAMES[currentFrameIndex];
+    downloadCompositeImage(photosToDownload, selectedTemplate, selectedFrame);
+  }, [filteredPhotos, photos, selectedTemplate, currentFrameIndex]);
 
   // Modal
   const handleImageClick = useCallback((src: string) => {

@@ -2,14 +2,20 @@
 
 import { DOWNLOAD_IMAGE_CONFIG, CANVAS_EXPORT_QUALITY } from '@/lib/constants';
 import { PhotoStripTemplate } from '@/lib/templates';
+import { Frame } from '@/lib/types';
 
 /**
- * Create composite image from 4 photos in vertical strip with template styling
+ * Create composite image from 4 photos in vertical strip with template and frame styling
  */
-export function downloadCompositeImage(images: (string | null)[], template?: PhotoStripTemplate): void {
+export function downloadCompositeImage(
+  images: (string | null)[], 
+  template?: PhotoStripTemplate,
+  frame?: Frame
+): void {
   const { cellWidth, cellHeight, gap, padding, footerHeight } = DOWNLOAD_IMAGE_CONFIG;
   
-  const textAreaHeight = template?.textArea.enabled ? footerHeight : 0;
+  // Always include footer for branding
+  const textAreaHeight = footerHeight;
   const totalWidth = cellWidth + padding * 2;
   const totalHeight = cellHeight * 4 + gap * 3 + padding * 2 + textAreaHeight;
 
@@ -23,8 +29,11 @@ export function downloadCompositeImage(images: (string | null)[], template?: Pho
     return;
   }
 
-  // Apply template background
-  if (template) {
+  // Apply background - prefer frame background if available, otherwise use template
+  if (frame) {
+    ctx.fillStyle = frame.backgroundColor;
+    ctx.fillRect(0, 0, totalWidth, totalHeight);
+  } else if (template) {
     applyTemplateBackground(ctx, canvas, template);
   } else {
     ctx.fillStyle = '#FFFFFF';
@@ -35,7 +44,7 @@ export function downloadCompositeImage(images: (string | null)[], template?: Pho
   const totalImages = images.filter((img) => img !== null).length;
 
   if (totalImages === 0) {
-    addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template);
+    addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
     return;
   }
 
@@ -44,7 +53,7 @@ export function downloadCompositeImage(images: (string | null)[], template?: Pho
     if (!imageSrc) {
       loadedCount++;
       if (loadedCount === totalImages) {
-        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template);
+        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
       }
       return;
     }
@@ -56,14 +65,16 @@ export function downloadCompositeImage(images: (string | null)[], template?: Pho
       
       ctx.drawImage(img, x, y, cellWidth, cellHeight);
       
-      // Apply template border
-      if (template) {
+      // Apply border - prefer frame border if available
+      if (frame) {
+        applyFrameBorder(ctx, x, y, cellWidth, cellHeight, frame);
+      } else if (template) {
         applyTemplateBorder(ctx, x, y, cellWidth, cellHeight, template);
       }
       
       loadedCount++;
       if (loadedCount === totalImages) {
-        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template);
+        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
       }
     };
     
@@ -71,7 +82,7 @@ export function downloadCompositeImage(images: (string | null)[], template?: Pho
       console.error(`Failed to load image ${index}`);
       loadedCount++;
       if (loadedCount === totalImages) {
-        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template);
+        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
       }
     };
     
@@ -130,6 +141,22 @@ function applyTemplateBorder(
 }
 
 /**
+ * Apply frame border
+ */
+function applyFrameBorder(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  frame: Frame
+): void {
+  ctx.strokeStyle = frame.borderColor;
+  ctx.lineWidth = frame.borderWidth;
+  ctx.strokeRect(x, y, width, height);
+}
+
+/**
  * Add decorations, footer and download
  */
 function addTemplateDecorationsAndDownload(
@@ -137,35 +164,39 @@ function addTemplateDecorationsAndDownload(
   ctx: CanvasRenderingContext2D,
   totalWidth: number,
   totalHeight: number,
-  template?: PhotoStripTemplate
+  template?: PhotoStripTemplate,
+  frame?: Frame
 ): void {
   const { footerHeight } = DOWNLOAD_IMAGE_CONFIG;
   
-  // Apply decorations
+  // Apply decorations from template
   if (template) {
     applyDecorations(ctx, canvas, template);
-    
-    // Add text area
-    if (template.textArea.enabled) {
-      const textY = totalHeight - footerHeight;
-      ctx.fillStyle = template.textArea.color;
-      ctx.font = `14px ${template.textArea.font}`;
-      ctx.textAlign = 'center';
-      const date = new Date().toLocaleDateString();
-      ctx.fillText(date, totalWidth / 2, textY + footerHeight / 2);
-    }
-  } else {
-    // Default footer
-    ctx.fillStyle = '#999999';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'center';
-    const dateStr = new Date().toLocaleDateString();
-    ctx.fillText(`Photo Booth - ${dateStr}`, totalWidth / 2, totalHeight - 8);
   }
+  
+  // Add footer text - use frame colors if available, otherwise template, otherwise defaults
+  const textY = totalHeight - footerHeight;
+  const textColor = frame?.borderColor || template?.textArea.color || '#666666';
+  const fontFamily = template?.textArea.font || 'Arial, sans-serif';
+  
+  ctx.textAlign = 'center';
+  
+  // Date
+  ctx.fillStyle = textColor;
+  ctx.font = `14px ${fontFamily}`;
+  const date = new Date().toLocaleDateString();
+  ctx.fillText(date, totalWidth / 2, textY + footerHeight / 2 - 6);
+  
+  // Branding - snapmemories by sagar
+  ctx.font = `10px ${fontFamily}`;
+  // Make branding slightly transparent
+  const brandingColor = textColor.length === 7 ? textColor + 'AA' : textColor;
+  ctx.fillStyle = brandingColor;
+  ctx.fillText('snapmemories by sagar', totalWidth / 2, textY + footerHeight / 2 + 10);
 
   // Download
   const link = document.createElement('a');
-  link.download = `photo-booth-${Date.now()}.jpg`;
+  link.download = `snapmemories-${Date.now()}.jpg`;
   link.href = canvas.toDataURL('image/jpeg', CANVAS_EXPORT_QUALITY);
   document.body.appendChild(link);
   link.click();
