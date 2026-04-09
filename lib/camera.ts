@@ -3,6 +3,16 @@
 import { CaptureOptions } from '@/lib/types';
 import { CAMERA_CONSTRAINTS, CANVAS_EXPORT_QUALITY } from '@/lib/constants';
 
+const MIN_READY_STATE_FOR_CAPTURE = 2;
+
+function isVideoReadyForCapture(video: HTMLVideoElement): boolean {
+  return (
+    video.readyState >= MIN_READY_STATE_FOR_CAPTURE &&
+    video.videoWidth > 0 &&
+    video.videoHeight > 0
+  );
+}
+
 /**
  * Start camera and return MediaStream
  */
@@ -28,6 +38,54 @@ export function stopCamera(stream: MediaStream | null): void {
 }
 
 /**
+ * Wait until video metadata and frame data are available for capture.
+ */
+export async function waitForVideoReady(
+  video: HTMLVideoElement,
+  timeoutMs = 5000
+): Promise<boolean> {
+  if (!video) return false;
+  if (isVideoReadyForCapture(video)) return true;
+
+  return new Promise((resolve) => {
+    let resolved = false;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    const cleanup = () => {
+      video.removeEventListener('loadedmetadata', checkReady);
+      video.removeEventListener('loadeddata', checkReady);
+      video.removeEventListener('canplay', checkReady);
+      video.removeEventListener('playing', checkReady);
+      if (timeoutId !== null) clearTimeout(timeoutId);
+      if (intervalId !== null) clearInterval(intervalId);
+    };
+
+    const finish = (ready: boolean) => {
+      if (resolved) return;
+      resolved = true;
+      cleanup();
+      resolve(ready);
+    };
+
+    const checkReady = () => {
+      if (isVideoReadyForCapture(video)) {
+        finish(true);
+      }
+    };
+
+    video.addEventListener('loadedmetadata', checkReady);
+    video.addEventListener('loadeddata', checkReady);
+    video.addEventListener('canplay', checkReady);
+    video.addEventListener('playing', checkReady);
+
+    intervalId = setInterval(checkReady, 50);
+    timeoutId = setTimeout(() => finish(false), timeoutMs);
+    checkReady();
+  });
+}
+
+/**
  * Capture a frame from video element
  */
 export function captureVideoFrame(
@@ -43,23 +101,11 @@ export function captureVideoFrame(
 
   // Check if video has metadata loaded
   if (!video.videoWidth || !video.videoHeight) {
-    console.error('captureVideoFrame: Video metadata not loaded', {
-      videoWidth: video.videoWidth,
-      videoHeight: video.videoHeight,
-      readyState: video.readyState,
-      srcObject: !!video.srcObject
-    });
     return null;
   }
 
   // Check readyState - must have current data
-  if (video.readyState < 2) {
-    console.error('captureVideoFrame: Video not ready (readyState < 2)', {
-      readyState: video.readyState,
-      HAVE_NOTHING: 0,
-      HAVE_METADATA: 1,
-      HAVE_CURRENT_DATA: 2
-    });
+  if (video.readyState < MIN_READY_STATE_FOR_CAPTURE) {
     return null;
   }
 

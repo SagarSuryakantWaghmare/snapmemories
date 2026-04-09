@@ -132,7 +132,7 @@ export default function BoothScreen({
           autoPlay
           playsInline
           muted
-          className="hidden"
+          className="absolute -left-[9999px] top-0 w-px h-px opacity-0 pointer-events-none"
         />
         
         {/* Large Video Preview (Desktop) */}

@@ -9,7 +9,7 @@ import ResultScreen from '@/components/ResultScreen';
 import Modal from '@/components/Modal';
 import { Screen, FilterName } from '@/lib/types';
 import { PhotoStripTemplate, PHOTO_STRIP_TEMPLATES, DEFAULT_TEMPLATE } from '@/lib/templates';
-import { startCamera, stopCamera, captureVideoFrame, applyVideoFilter } from '@/lib/camera';
+import { startCamera, stopCamera, captureVideoFrame, applyVideoFilter, waitForVideoReady } from '@/lib/camera';
 import { downloadCompositeImage, delay } from '@/lib/canvas';
 import { batchFilterImages } from '@/lib/filters';
 import { PHOTO_COUNT, COUNTDOWN_SECONDS, FLASH_DURATION_MS, CAPTURE_DELAY_MS, PRINTING_ANIMATION_MS, FRAMES } from '@/lib/constants';
@@ -33,6 +33,7 @@ export default function Home() {
   
   // Camera state
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   
   // Frame selection
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
@@ -51,78 +52,40 @@ export default function Home() {
 
   // Camera management
   const initCamera = useCallback(async () => {
+    setIsCameraReady(false);
+
     try {
       const mediaStream = await startCamera();
       setStream(mediaStream);
       if (videoRef.current) {
+        const video = videoRef.current;
+
         // Set srcObject first
-        videoRef.current.srcObject = mediaStream;
+        video.srcObject = mediaStream;
         
         // Ensure video plays
         try {
-          await videoRef.current.play();
+          await video.play();
         } catch (playError) {
           console.log('Auto-play blocked, user interaction may be required:', playError);
         }
 
-        // Wait for video to be ready for capture
-        await new Promise<void>((resolve) => {
-          const video = videoRef.current;
-          if (!video) {
-            resolve();
-            return;
-          }
+        const ready = await waitForVideoReady(video, 5000);
+        setIsCameraReady(ready);
 
-          let timeoutId: ReturnType<typeof setTimeout> | null = null;
-          let resolved = false;
-
-          // Set up ready state check
-          const checkReady = () => {
-            if (resolved) return;
-            if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
-              console.log('Video ready for capture', {
-                videoWidth: video.videoWidth,
-                videoHeight: video.videoHeight,
-                readyState: video.readyState,
-              });
-              resolved = true;
-              video.removeEventListener('loadeddata', checkReady);
-              video.removeEventListener('canplay', checkReady);
-              video.removeEventListener('playing', checkReady);
-              if (timeoutId !== null) {
-                clearTimeout(timeoutId);
-              }
-              resolve();
-            }
-          };
-
-          video.addEventListener('loadeddata', checkReady);
-          video.addEventListener('canplay', checkReady);
-          video.addEventListener('playing', checkReady);
-          
-          // Check immediately in case already ready
-          checkReady();
-
-          // Fallback timeout
-          timeoutId = setTimeout(() => {
-            if (!resolved) {
-              console.log('Video initialization timeout, continuing anyway');
-              resolved = true;
-              video.removeEventListener('loadeddata', checkReady);
-              video.removeEventListener('canplay', checkReady);
-              video.removeEventListener('playing', checkReady);
-              resolve();
-            }
-          }, 5000);
-        });
+        if (!ready) {
+          console.warn('Camera stream started, but video is still not ready for capture');
+        }
       }
     } catch (error) {
+      setIsCameraReady(false);
       console.error('Failed to start camera:', error);
       alert('Unable to access camera. Please check permissions.');
     }
   }, []);
 
   const cleanupCamera = useCallback(() => {
+    setIsCameraReady(false);
     if (stream) {
       stopCamera(stream);
       setStream(null);
@@ -190,10 +153,11 @@ export default function Home() {
 
   // Photo capture sequence
   const startPhotoSession = useCallback(async () => {
-    if (isCapturing || !stream || !videoRef.current || !canvasRef.current) {
+    if (isCapturing || !stream || !isCameraReady || !videoRef.current || !canvasRef.current) {
       console.log('Cannot start capture:', {
         isCapturing,
         hasStream: !!stream,
+        isCameraReady,
         hasVideo: !!videoRef.current,
         hasCanvas: !!canvasRef.current
       });
@@ -205,6 +169,8 @@ export default function Home() {
     
     // Create array to hold all photos
     const capturedPhotos: string[] = [];
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
 
     for (let i = 0; i < PHOTO_COUNT; i++) {
       setCurrentPhotoIndex(i);
@@ -219,15 +185,24 @@ export default function Home() {
       
       // Retry capture if video not immediately ready
       let photo: string | null = null;
-      for (let retryCount = 0; retryCount < 3; retryCount++) {
-        photo = captureVideoFrame(videoRef.current, canvasRef.current, { isBW });
+      for (let retryCount = 0; retryCount < 5; retryCount++) {
+        const ready = await waitForVideoReady(video, 1200);
+        if (!ready) {
+          if (retryCount < 4) {
+            console.warn(`Photo ${i + 1} waiting for camera readiness, retrying...`);
+            await delay(120);
+          }
+          continue;
+        }
+
+        photo = captureVideoFrame(video, canvas, { isBW });
         if (photo) {
           console.log(`Photo ${i + 1} captured successfully on attempt ${retryCount + 1}`);
           break;
         }
-        if (retryCount < 2) {
+        if (retryCount < 4) {
           console.warn(`Photo ${i + 1} capture failed, retrying...`);
-          await delay(100);
+          await delay(120);
         }
       }
       
@@ -240,7 +215,7 @@ export default function Home() {
         }
         setPhotos(updatedPhotos);
       } else {
-        console.error(`Failed to capture photo ${i + 1} after 3 attempts`);
+        console.warn(`Failed to capture photo ${i + 1} after 5 attempts`);
       }
       
       // Flash effect
@@ -261,10 +236,10 @@ export default function Home() {
       cleanupCamera();
       setCurrentScreen('frameSelection');
     } else {
-      console.error('No photos captured! Staying on booth screen');
+      console.warn('No photos captured. Staying on booth screen');
       setIsCapturing(false);
     }
-  }, [isCapturing, stream, isBW, cleanupCamera]);
+  }, [isCapturing, stream, isCameraReady, isBW, cleanupCamera]);
 
   // Countdown animation
   const showCountdown = async (photoIndex: number): Promise<void> => {
@@ -396,7 +371,7 @@ export default function Home() {
           onRecordClick={startPhotoSession}
           onUpload={handleUpload}
           onHome={goHome}
-          recordDisabled={!stream || isCapturing}
+          recordDisabled={!stream || !isCameraReady || isCapturing}
           videoRef={videoRef}
           photos={photos}
           currentPhotoIndex={currentPhotoIndex}
