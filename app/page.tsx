@@ -34,6 +34,7 @@ export default function Home() {
   // Camera state
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   
   // Frame selection
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
@@ -53,6 +54,7 @@ export default function Home() {
   // Camera management
   const initCamera = useCallback(async () => {
     setIsCameraReady(false);
+    setCameraError(null);
 
     try {
       const mediaStream = await startCamera();
@@ -74,13 +76,17 @@ export default function Home() {
         setIsCameraReady(ready);
 
         if (!ready) {
-          console.warn('Camera stream started, but video is still not ready for capture');
+          const readinessMessage = 'Camera stream started, but video is still warming up.';
+          console.warn(readinessMessage);
+          setCameraError(readinessMessage);
+        } else {
+          setCameraError(null);
         }
       }
     } catch (error) {
       setIsCameraReady(false);
+      setCameraError('Unable to access camera. Please check permissions or upload photos instead.');
       console.error('Failed to start camera:', error);
-      alert('Unable to access camera. Please check permissions.');
     }
   }, []);
 
@@ -128,6 +134,7 @@ export default function Home() {
     setShowFinalKiosk(false);
     setCurrentFrameIndex(0);
     setCurrentPhotoIndex(0);
+    setCameraError(null);
   }, []);
 
   // Navigation functions
@@ -154,6 +161,9 @@ export default function Home() {
   // Photo capture sequence
   const startPhotoSession = useCallback(async () => {
     if (isCapturing || !stream || !isCameraReady || !videoRef.current || !canvasRef.current) {
+      if (!isCameraReady && !cameraError) {
+        setCameraError('Camera is still getting ready. Please wait a moment.');
+      }
       console.log('Cannot start capture:', {
         isCapturing,
         hasStream: !!stream,
@@ -239,7 +249,7 @@ export default function Home() {
       console.warn('No photos captured. Staying on booth screen');
       setIsCapturing(false);
     }
-  }, [isCapturing, stream, isCameraReady, isBW, cleanupCamera]);
+  }, [isCapturing, stream, isCameraReady, cameraError, isBW, cleanupCamera]);
 
   // Countdown animation
   const showCountdown = async (photoIndex: number): Promise<void> => {
@@ -295,6 +305,7 @@ export default function Home() {
         
         if (loadedCount === files.length) {
           setPhotos(newPhotos);
+          setCameraError(null);
           setTimeout(() => {
             cleanupCamera();
             setCurrentScreen('frameSelection');
@@ -349,7 +360,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-white">
+    <div className="w-full min-h-screen overflow-hidden bg-white">
       <canvas ref={canvasRef} className="hidden" />
 
       {currentScreen === 'home' && <HomeScreen onEnter={goToTemplateSelection} />}
@@ -367,6 +378,8 @@ export default function Home() {
       {currentScreen === 'booth' && (
         <BoothScreen
           isBW={isBW}
+          isCameraReady={isCameraReady}
+          cameraError={cameraError}
           onBWToggle={toggleBW}
           onRecordClick={startPhotoSession}
           onUpload={handleUpload}

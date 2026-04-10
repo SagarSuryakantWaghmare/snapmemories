@@ -36,6 +36,8 @@ export interface CameraState {
 
 export interface BoothScreenProps {
   isBW: boolean;
+  isCameraReady: boolean;
+  cameraError: string | null;
   onBWToggle: (checked: boolean) => void;
   onRecordClick: () => void;
   onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;

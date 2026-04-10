@@ -19,47 +19,38 @@ export default function TemplateSelection({
   onHome,
 }: TemplateSelectionProps) {
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col overflow-hidden">
-      {/* Floating Navigation */}
+    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col overflow-hidden">
       <FloatingNav showBack={!!onHome} onBack={onHome} />
 
-      {/* Title */}
-      <div className="pt-14 pb-3 text-center shrink-0 px-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-black">Choose Your Style</h1>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1">
-          Select a photo strip template
-        </p>
-      </div>
+      <main className="flex h-full min-h-screen flex-col">
+        <header className="pt-16 pb-4 text-center px-4">
+          <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 font-semibold">Step 1 of 3</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-black mt-1">Choose your style</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Selected: <span className="font-medium text-gray-700">{selectedTemplate.name}</span> - {selectedTemplate.description}
+          </p>
+        </header>
 
-      {/* Template Grid */}
-      <div className="flex-1 overflow-auto px-3 pb-24">
-        <div className="max-w-lg mx-auto">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="flex-1 overflow-auto px-3 pb-36">
+          <div className="max-w-xl mx-auto grid grid-cols-2 gap-3 sm:gap-4">
             {templates.map((template) => {
               const isSelected = selectedTemplate.id === template.id;
-              
+
               return (
                 <button
                   key={template.id}
+                  type="button"
                   onClick={() => onSelectTemplate(template)}
-                  className={`
-                    relative group
-                    bg-white rounded-lg overflow-hidden
-                    border-2 transition-all duration-200
-                    hover:shadow-lg active:scale-[0.98]
-                    ${isSelected ? 'border-black shadow-md' : 'border-gray-200'}
-                  `}
+                  aria-pressed={isSelected}
+                  aria-label={`Select ${template.name} template`}
+                  className={`relative group bg-white rounded-xl overflow-hidden border-2 transition-all duration-200 hover:shadow-lg active:scale-[0.98] ${
+                    isSelected ? 'border-black shadow-md scale-[1.01]' : 'border-gray-200'
+                  }`}
                 >
-                  {/* Template Preview */}
-                  <div 
+                  <div
                     className="aspect-[3/4] p-3 flex flex-col items-center justify-center relative"
-                    style={{
-                      background: template.colors.background.startsWith('linear-gradient')
-                        ? template.colors.background
-                        : template.colors.background,
-                    }}
+                    style={{ background: template.colors.background }}
                   >
-                    {/* Mini photo strip preview */}
                     <div className="w-full max-w-[80px] flex flex-col gap-0.5">
                       {[1, 2, 3, 4].map((index) => (
                         <div
@@ -76,7 +67,6 @@ export default function TemplateSelection({
                       ))}
                     </div>
 
-                    {/* Decoration indicators */}
                     {template.decorations.type === 'confetti' && (
                       <div className="absolute inset-0 pointer-events-none">
                         {[...Array(6)].map((_, i) => (
@@ -85,7 +75,7 @@ export default function TemplateSelection({
                             className="absolute w-1.5 h-1.5 rounded-full"
                             style={{
                               background: [template.colors.primary, template.colors.secondary, template.colors.accent][i % 3],
-                              top: `${15 + (i * 15)}%`,
+                              top: `${15 + i * 15}%`,
                               left: `${10 + (i % 2) * 75}%`,
                             }}
                           />
@@ -102,11 +92,9 @@ export default function TemplateSelection({
                     )}
 
                     {template.decorations.type === 'neon' && (
-                      <div 
+                      <div
                         className="absolute inset-0 pointer-events-none"
-                        style={{
-                          boxShadow: `inset 0 0 15px ${template.colors.primary}40`,
-                        }}
+                        style={{ boxShadow: `inset 0 0 15px ${template.colors.primary}40` }}
                       />
                     )}
 
@@ -126,35 +114,20 @@ export default function TemplateSelection({
                     )}
                   </div>
 
-                  {/* Template Info */}
-                  <div className="p-2 border-t border-gray-100 bg-white">
-                    <h3 className="font-semibold text-xs text-black truncate">
-                      {template.name}
-                    </h3>
+                  <div className="p-2.5 border-t border-gray-100 bg-white text-left">
+                    <h3 className="font-semibold text-xs sm:text-sm text-black truncate">{template.name}</h3>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">{template.description}</p>
 
-                    {/* Color swatches */}
-                    <div className="flex gap-1 mt-1">
-                      <div
-                        className="w-3 h-3 rounded-full border border-gray-200"
-                        style={{ background: template.colors.primary }}
-                      />
-                      <div
-                        className="w-3 h-3 rounded-full border border-gray-200"
-                        style={{ background: template.colors.secondary }}
-                      />
-                      <div
-                        className="w-3 h-3 rounded-full border border-gray-200"
-                        style={{ background: template.colors.accent }}
-                      />
+                    <div className="flex gap-1 mt-1.5">
+                      <div className="w-3 h-3 rounded-full border border-gray-200" style={{ background: template.colors.primary }} />
+                      <div className="w-3 h-3 rounded-full border border-gray-200" style={{ background: template.colors.secondary }} />
+                      <div className="w-3 h-3 rounded-full border border-gray-200" style={{ background: template.colors.accent }} />
                     </div>
                   </div>
 
-                  {/* Selection indicator */}
                   {isSelected && (
-                    <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-black text-white rounded-full flex items-center justify-center shadow">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
+                    <div className="absolute top-2 right-2 rounded-full bg-black text-white text-[10px] px-2 py-0.5 shadow">
+                      Selected
                     </div>
                   )}
                 </button>
@@ -162,27 +135,20 @@ export default function TemplateSelection({
             })}
           </div>
         </div>
-      </div>
 
-      {/* Floating Continue Button */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-        <button
-          onClick={onContinue}
-          className="px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full 
-                     hover:bg-gray-800 active:scale-95 
-                     transition-all duration-150 
-                     shadow-xl"
-        >
-          Continue to Booth →
-        </button>
-      </div>
-
-      {/* Bottom Branding */}
-      <div className="fixed bottom-16 left-0 right-0 text-center pointer-events-none">
-        <p className="text-[9px] text-gray-400 tracking-wider">
-          snapmemoriesbysagar
-        </p>
-      </div>
+        <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-3 pb-4 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
+          <div className="mx-auto max-w-md text-center mb-2">
+            <p className="text-[10px] text-gray-500">snapmemories by sagar</p>
+          </div>
+          <button
+            type="button"
+            onClick={onContinue}
+            className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl"
+          >
+            Continue with {selectedTemplate.name} →
+          </button>
+        </div>
+      </main>
     </div>
   );
 }
