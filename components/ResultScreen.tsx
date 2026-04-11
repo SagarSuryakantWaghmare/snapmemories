@@ -22,7 +22,7 @@ export default function ResultScreen({
     <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col overflow-hidden">
       <FloatingNav showBack onBack={onHome} />
 
-      <main className="flex-1 flex flex-col items-center justify-center gap-4 p-4 pt-16 pb-36 overflow-auto">
+      <main className="flex-1 flex flex-col items-center justify-start sm:justify-center gap-3 p-4 pt-14 sm:pt-16 pb-28 sm:pb-32 overflow-auto">
         {showPrinting && (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/10 bg-white px-6 py-5 shadow-md">
             <svg width="64" height="64" viewBox="0 0 100 100" className="animate-pulse" aria-hidden>
@@ -107,7 +107,7 @@ export default function ResultScreen({
         )}
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-3 pb-4 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
         <div className="mx-auto flex max-w-md gap-2">
           <button
             type="button"

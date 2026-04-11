@@ -110,7 +110,7 @@ export default function BoothScreen({
         className="hidden"
       />
 
-      <main className="flex-1 flex items-center justify-center gap-4 sm:gap-6 p-3 sm:p-4 pt-20 pb-44 overflow-hidden">
+      <main className="flex-1 flex items-center justify-center gap-4 sm:gap-6 p-3 sm:p-4 pt-16 sm:pt-20 pb-28 sm:pb-32 overflow-hidden">
         <video
           ref={videoRef}
           autoPlay
@@ -216,7 +216,7 @@ export default function BoothScreen({
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 bg-gradient-to-t from-white via-white/95 to-white/70 px-4 pt-3 pb-4 safe-bottom backdrop-blur">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 bg-gradient-to-t from-white via-white/95 to-white/70 px-4 pt-2.5 pb-3 safe-bottom backdrop-blur">
         <div className="mx-auto flex w-full max-w-md items-end justify-between gap-3">
           <button
             type="button"

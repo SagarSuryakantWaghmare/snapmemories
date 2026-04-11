@@ -23,7 +23,7 @@ export default function TemplateSelection({
       <FloatingNav showBack={!!onHome} onBack={onHome} />
 
       <main className="flex h-full min-h-screen flex-col">
-        <header className="pt-16 pb-4 text-center px-4">
+        <header className="pt-14 sm:pt-16 pb-3 text-center px-4">
           <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 font-semibold">Step 1 of 3</p>
           <h1 className="text-xl sm:text-2xl font-bold text-black mt-1">Choose your style</h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
@@ -31,7 +31,7 @@ export default function TemplateSelection({
           </p>
         </header>
 
-        <div className="flex-1 overflow-auto px-3 pb-36">
+        <div className="flex-1 overflow-auto px-3 pb-28 sm:pb-32">
           <div className="max-w-xl mx-auto grid grid-cols-2 gap-3 sm:gap-4">
             {templates.map((template) => {
               const isSelected = selectedTemplate.id === template.id;
@@ -136,10 +136,7 @@ export default function TemplateSelection({
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-3 pb-4 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
-          <div className="mx-auto max-w-md text-center mb-2">
-            <p className="text-[10px] text-gray-500">snapmemories by sagar</p>
-          </div>
+        <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
           <button
             type="button"
             onClick={onContinue}

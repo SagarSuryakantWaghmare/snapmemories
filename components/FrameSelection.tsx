@@ -170,14 +170,14 @@ export default function FrameSelection({
       <FloatingNav showBack onBack={onHome} />
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="pt-16 pb-3 text-center shrink-0 px-4">
+        <header className="pt-14 sm:pt-16 pb-2 text-center shrink-0 px-4">
           <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 font-semibold">Step 2 of 3</p>
           <h1 className="text-xl sm:text-2xl font-bold text-black mt-1">Choose your frame</h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">Swipe, tap, or use keyboard arrows to select a style.</p>
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-3 pb-36 overflow-hidden">
-          <div className="relative w-full max-w-md flex items-center justify-center mb-4">
+        <div className="flex-1 flex flex-col items-center justify-center px-3 pb-28 sm:pb-32 overflow-hidden">
+          <div className="relative w-full max-w-md flex items-center justify-center mb-3">
             <button
               type="button"
               onClick={goToPrevFrame}
@@ -227,7 +227,7 @@ export default function FrameSelection({
             </button>
           </div>
 
-          <div className="flex gap-1.5 mb-4">
+          <div className="flex gap-1.5 mb-3">
             {FRAMES.map((frame, index) => (
               <button
                 key={frame.id}
@@ -283,7 +283,7 @@ export default function FrameSelection({
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-3 pb-4 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
         <button
           type="button"
           onClick={onSelectFrame}

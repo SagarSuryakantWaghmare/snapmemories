@@ -5,8 +5,8 @@ import { HomeScreenProps } from '@/lib/types';
 export default function HomeScreen({ onEnter }: HomeScreenProps) {
   return (
     <main className="w-full h-full min-h-screen bg-gradient-to-br from-white via-white to-gray-100 flex flex-col items-center justify-center overflow-hidden p-4 relative">
-      <section className="w-full max-w-md rounded-3xl border border-black/10 bg-white/90 backdrop-blur p-6 sm:p-8 text-center shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
-        <p className="text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase text-gray-500 mb-3">
+      <section className="w-full max-w-md rounded-3xl border border-black/10 bg-white/90 backdrop-blur p-5 sm:p-6 text-center shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+        <p className="text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase text-gray-500 mb-2">
           snapmemories
         </p>
 
@@ -14,12 +14,12 @@ export default function HomeScreen({ onEnter }: HomeScreenProps) {
           Photo Booth
         </h1>
 
-        <p className="text-sm sm:text-base text-gray-600 mt-2 mb-6">
+        <p className="text-sm sm:text-base text-gray-600 mt-2 mb-4">
           Capture four moments and leave with a polished photo strip.
         </p>
 
-        <div className="mx-auto mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-2xl border border-black/15 bg-white shadow-sm">
-          <svg viewBox="0 0 120 120" className="text-black w-14 h-14 sm:w-16 sm:h-16" aria-hidden>
+        <div className="mx-auto mb-4 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border border-black/15 bg-white shadow-sm">
+          <svg viewBox="0 0 120 120" className="text-black w-12 h-12 sm:w-14 sm:h-14" aria-hidden>
             <rect x="20" y="40" width="80" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="3" />
             <circle cx="60" cy="70" r="20" fill="none" stroke="currentColor" strokeWidth="3" />
             <circle cx="60" cy="70" r="12" fill="currentColor" opacity="0.12" />
@@ -28,7 +28,7 @@ export default function HomeScreen({ onEnter }: HomeScreenProps) {
           </svg>
         </div>
 
-        <div className="mb-7 flex flex-wrap justify-center gap-2 text-[11px] sm:text-xs text-gray-600">
+        <div className="mb-4 flex flex-wrap justify-center gap-2 text-[11px] sm:text-xs text-gray-600">
           <span className="rounded-full bg-gray-100 px-2.5 py-1">4 auto shots</span>
           <span className="rounded-full bg-gray-100 px-2.5 py-1">Live filters</span>
           <span className="rounded-full bg-gray-100 px-2.5 py-1">Instant download</span>
@@ -37,7 +37,7 @@ export default function HomeScreen({ onEnter }: HomeScreenProps) {
         <button
           type="button"
           onClick={onEnter}
-          className="w-full px-8 sm:px-10 py-3.5 sm:py-4 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2"
+          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2"
         >
           Start Photo Booth
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
