@@ -102,4 +102,5 @@ export const DOWNLOAD_IMAGE_CONFIG = {
   gap: 4,
   padding: 14,
   footerHeight: 40,
+  renderScale: 2,
 } as const;

@@ -12,7 +12,7 @@ export function downloadCompositeImage(
   template?: PhotoStripTemplate,
   frame?: Frame
 ): void {
-  const { cellWidth, cellHeight, gap, padding, footerHeight } = DOWNLOAD_IMAGE_CONFIG;
+  const { cellWidth, cellHeight, gap, padding, footerHeight, renderScale } = DOWNLOAD_IMAGE_CONFIG;
   
   // Always include footer for branding
   const textAreaHeight = footerHeight;
@@ -20,8 +20,8 @@ export function downloadCompositeImage(
   const totalHeight = cellHeight * 4 + gap * 3 + padding * 2 + textAreaHeight;
 
   const canvas = document.createElement('canvas');
-  canvas.width = totalWidth;
-  canvas.height = totalHeight;
+  canvas.width = Math.round(totalWidth * renderScale);
+  canvas.height = Math.round(totalHeight * renderScale);
   
   const ctx = canvas.getContext('2d');
   if (!ctx) {
@@ -29,64 +29,33 @@ export function downloadCompositeImage(
     return;
   }
 
+  ctx.scale(renderScale, renderScale);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
   // Apply background - prefer frame background if available, otherwise use template
   if (frame) {
     ctx.fillStyle = frame.backgroundColor;
     ctx.fillRect(0, 0, totalWidth, totalHeight);
   } else if (template) {
-    applyTemplateBackground(ctx, canvas, template);
+    applyTemplateBackground(ctx, totalWidth, totalHeight, template);
   } else {
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, totalWidth, totalHeight);
   }
 
-  let loadedCount = 0;
-  const totalImages = images.filter((img) => img !== null).length;
-
-  if (totalImages === 0) {
-    addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
-    return;
-  }
-
-  // Load and draw images in vertical strip
-  images.forEach((imageSrc, index) => {
-    if (!imageSrc) {
-      loadedCount++;
-      if (loadedCount === totalImages) {
-        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
+  Promise.all(images.map((imageSrc, index) => loadImageForCanvas(imageSrc, index))).then((loadedImages) => {
+    loadedImages.forEach((img, index) => {
+      if (!img) {
+        return;
       }
-      return;
-    }
 
-    const img = new Image();
-    img.onload = () => {
       const x = padding;
       const y = padding + index * (cellHeight + gap);
-      
-      ctx.drawImage(img, x, y, cellWidth, cellHeight);
-      
-      // Apply border - prefer frame border if available
-      if (frame) {
-        applyFrameBorder(ctx, x, y, cellWidth, cellHeight, frame);
-      } else if (template) {
-        applyTemplateBorder(ctx, x, y, cellWidth, cellHeight, template);
-      }
-      
-      loadedCount++;
-      if (loadedCount === totalImages) {
-        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
-      }
-    };
-    
-    img.onerror = () => {
-      console.error(`Failed to load image ${index}`);
-      loadedCount++;
-      if (loadedCount === totalImages) {
-        addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
-      }
-    };
-    
-    img.src = imageSrc;
+      drawPhotoCell(ctx, img, x, y, cellWidth, cellHeight, template, frame);
+    });
+
+    addTemplateDecorationsAndDownload(canvas, ctx, totalWidth, totalHeight, template, frame);
   });
 }
 
@@ -95,7 +64,8 @@ export function downloadCompositeImage(
  */
 function applyTemplateBackground(
   ctx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
+  canvasWidth: number,
+  canvasHeight: number,
   template: PhotoStripTemplate
 ): void {
   const bg = template.colors.background;
@@ -103,7 +73,7 @@ function applyTemplateBackground(
   if (bg.startsWith('linear-gradient')) {
     const match = bg.match(/#[0-9a-fA-F]{6}/g);
     if (match && match.length >= 2) {
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
       gradient.addColorStop(0, match[0]);
       gradient.addColorStop(1, match[1]);
       ctx.fillStyle = gradient;
@@ -114,7 +84,7 @@ function applyTemplateBackground(
     ctx.fillStyle = bg;
   }
   
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 }
 
 /**
@@ -153,7 +123,236 @@ function applyFrameBorder(
 ): void {
   ctx.strokeStyle = frame.borderColor;
   ctx.lineWidth = frame.borderWidth;
-  ctx.strokeRect(x, y, width, height);
+  const halfLine = frame.borderWidth / 2;
+  ctx.strokeRect(x + halfLine, y + halfLine, width - frame.borderWidth, height - frame.borderWidth);
+}
+
+function loadImageForCanvas(imageSrc: string | null, index: number): Promise<HTMLImageElement | null> {
+  if (!imageSrc) {
+    return Promise.resolve(null);
+  }
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => {
+      console.error(`Failed to load image ${index}`);
+      resolve(null);
+    };
+    img.src = imageSrc;
+  });
+}
+
+function drawPhotoCell(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  template?: PhotoStripTemplate,
+  frame?: Frame
+): void {
+  if (!frame) {
+    drawImageCover(ctx, image, x, y, width, height);
+    if (template) {
+      applyTemplateBorder(ctx, x, y, width, height, template);
+    }
+    return;
+  }
+
+  switch (frame.shape) {
+    case 'circle':
+      drawShapedFrameCell(ctx, image, x, y, width, height, frame, 'circle');
+      break;
+    case 'heart':
+      drawShapedFrameCell(ctx, image, x, y, width, height, frame, 'heart');
+      break;
+    case 'polaroid':
+      drawPolaroidFrameCell(ctx, image, x, y, width, height, frame);
+      break;
+    default:
+      drawRectangleFrameCell(ctx, image, x, y, width, height, frame);
+      break;
+  }
+}
+
+function drawRectangleFrameCell(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  frame: Frame
+): void {
+  ctx.fillStyle = frame.backgroundColor;
+  ctx.fillRect(x, y, width, height);
+  drawImageCover(ctx, image, x, y, width, height);
+  applyFrameBorder(ctx, x, y, width, height, frame);
+}
+
+function drawShapedFrameCell(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  frame: Frame,
+  shape: 'circle' | 'heart'
+): void {
+  const inset = Math.max(2, frame.borderWidth + 1);
+  const photoX = x + inset;
+  const photoY = y + inset;
+  const photoWidth = width - inset * 2;
+  const photoHeight = height - inset * 2;
+
+  if (photoWidth <= 0 || photoHeight <= 0) {
+    return;
+  }
+
+  ctx.fillStyle = frame.backgroundColor;
+  ctx.fillRect(x, y, width, height);
+
+  ctx.save();
+  beginShapePath(ctx, shape, photoX, photoY, photoWidth, photoHeight);
+  ctx.clip();
+  drawImageCover(ctx, image, photoX, photoY, photoWidth, photoHeight);
+  ctx.restore();
+
+  ctx.strokeStyle = frame.borderColor;
+  ctx.lineWidth = frame.borderWidth;
+  beginShapePath(ctx, shape, photoX, photoY, photoWidth, photoHeight);
+  ctx.stroke();
+}
+
+function drawPolaroidFrameCell(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  frame: Frame
+): void {
+  const inset = Math.max(8, Math.min(Math.round(frame.borderWidth), 24));
+  const bottomInset = Math.round(inset * 1.8);
+  const photoX = x + inset;
+  const photoY = y + inset;
+  const photoWidth = width - inset * 2;
+  const photoHeight = height - inset - bottomInset;
+
+  if (photoWidth <= 0 || photoHeight <= 0) {
+    return;
+  }
+
+  ctx.fillStyle = frame.backgroundColor;
+  ctx.fillRect(x, y, width, height);
+
+  ctx.strokeStyle = frame.borderColor;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
+
+  drawImageCover(ctx, image, photoX, photoY, photoWidth, photoHeight);
+  ctx.strokeRect(photoX + 0.5, photoY + 0.5, photoWidth - 1, photoHeight - 1);
+}
+
+function beginShapePath(
+  ctx: CanvasRenderingContext2D,
+  shape: 'circle' | 'heart',
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  ctx.beginPath();
+
+  if (shape === 'circle') {
+    const radius = Math.min(width, height) / 2;
+    ctx.arc(x + width / 2, y + height / 2, radius, 0, Math.PI * 2);
+    ctx.closePath();
+    return;
+  }
+
+  const point = (nx: number, ny: number) => ({
+    x: x + (nx / 100) * width,
+    y: y + (ny / 100) * height,
+  });
+
+  const p1 = point(50, 88);
+  const p2 = point(25, 65);
+  const p3 = point(5, 50);
+  const p4 = point(5, 30);
+  const p5 = point(5, 15);
+  const p6 = point(20, 5);
+  const p7 = point(35, 5);
+  const p8 = point(45, 5);
+  const p9 = point(50, 15);
+  const p10 = point(55, 5);
+  const p11 = point(65, 5);
+  const p12 = point(80, 5);
+  const p13 = point(95, 15);
+  const p14 = point(95, 30);
+  const p15 = point(95, 50);
+  const p16 = point(75, 65);
+  const p17 = point(50, 88);
+
+  ctx.moveTo(p1.x, p1.y);
+  ctx.bezierCurveTo(p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
+  ctx.bezierCurveTo(p5.x, p5.y, p6.x, p6.y, p7.x, p7.y);
+  ctx.bezierCurveTo(p8.x, p8.y, p9.x, p9.y, p9.x, p9.y);
+  ctx.bezierCurveTo(p9.x, p9.y, p10.x, p10.y, p11.x, p11.y);
+  ctx.bezierCurveTo(p12.x, p12.y, p13.x, p13.y, p14.x, p14.y);
+  ctx.bezierCurveTo(p15.x, p15.y, p16.x, p16.y, p17.x, p17.y);
+  ctx.closePath();
+}
+
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  destX: number,
+  destY: number,
+  destWidth: number,
+  destHeight: number
+): void {
+  if (destWidth <= 0 || destHeight <= 0) {
+    return;
+  }
+
+  const sourceWidth = image.naturalWidth || image.width;
+  const sourceHeight = image.naturalHeight || image.height;
+
+  if (!sourceWidth || !sourceHeight) {
+    return;
+  }
+
+  const sourceRatio = sourceWidth / sourceHeight;
+  const destRatio = destWidth / destHeight;
+  let cropWidth = sourceWidth;
+  let cropHeight = sourceHeight;
+  let cropX = 0;
+  let cropY = 0;
+
+  if (sourceRatio > destRatio) {
+    cropWidth = sourceHeight * destRatio;
+    cropX = (sourceWidth - cropWidth) / 2;
+  } else {
+    cropHeight = sourceWidth / destRatio;
+    cropY = (sourceHeight - cropHeight) / 2;
+  }
+
+  ctx.drawImage(
+    image,
+    cropX,
+    cropY,
+    cropWidth,
+    cropHeight,
+    destX,
+    destY,
+    destWidth,
+    destHeight
+  );
 }
 
 /**
@@ -171,7 +370,7 @@ function addTemplateDecorationsAndDownload(
   
   // Apply decorations from template
   if (template) {
-    applyDecorations(ctx, canvas, template);
+    applyDecorations(ctx, totalWidth, totalHeight, template);
   }
   
   // Add footer text - use frame colors if available, otherwise template, otherwise defaults
@@ -208,36 +407,42 @@ function addTemplateDecorationsAndDownload(
  */
 function applyDecorations(
   ctx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
+  canvasWidth: number,
+  canvasHeight: number,
   template: PhotoStripTemplate
 ): void {
   switch (template.decorations.type) {
     case 'confetti':
-      drawConfetti(ctx, canvas, template);
+      drawConfetti(ctx, canvasWidth, canvasHeight, template);
       break;
     case 'hearts':
-      drawHearts(ctx, canvas, template);
+      drawHearts(ctx, canvasWidth, canvasHeight, template);
       break;
     case 'film':
-      drawFilmPerforations(ctx, canvas, template);
+      drawFilmPerforations(ctx, canvasWidth, canvasHeight, template);
       break;
     case 'neon':
-      drawNeonScanlines(ctx, canvas, template);
+      drawNeonScanlines(ctx, canvasWidth, canvasHeight, template);
       break;
     case 'polaroid':
-      drawPolaroidShadow(ctx, canvas);
+      drawPolaroidShadow(ctx, canvasWidth, canvasHeight);
       break;
   }
 }
 
 // Decoration functions
-function drawConfetti(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, template: PhotoStripTemplate): void {
+function drawConfetti(
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number,
+  template: PhotoStripTemplate
+): void {
   const count = Math.floor(40 * template.decorations.intensity);
   const colors = [template.colors.primary, template.colors.secondary, template.colors.accent];
   
   for (let i = 0; i < count; i++) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
+    const x = Math.random() * canvasWidth;
+    const y = Math.random() * canvasHeight;
     const size = 4 + Math.random() * 6;
     const rotation = Math.random() * Math.PI;
     const color = colors[Math.floor(Math.random() * colors.length)];
@@ -251,12 +456,17 @@ function drawConfetti(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, 
   }
 }
 
-function drawHearts(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, template: PhotoStripTemplate): void {
+function drawHearts(
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number,
+  template: PhotoStripTemplate
+): void {
   const count = Math.floor(12 * template.decorations.intensity);
   
   for (let i = 0; i < count; i++) {
-    const x = 10 + Math.random() * (canvas.width - 20);
-    const y = 10 + Math.random() * (canvas.height - 20);
+    const x = 10 + Math.random() * (canvasWidth - 20);
+    const y = 10 + Math.random() * (canvasHeight - 20);
     const size = 10 + Math.random() * 15;
     
     ctx.fillStyle = template.colors.accent + '60';
@@ -275,32 +485,46 @@ function drawHeart(ctx: CanvasRenderingContext2D, x: number, y: number, size: nu
   ctx.restore();
 }
 
-function drawFilmPerforations(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, template: PhotoStripTemplate): void {
+function drawFilmPerforations(
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number,
+  template: PhotoStripTemplate
+): void {
   const perfWidth = 6;
   const perfHeight = 12;
   const spacing = 16;
   
   ctx.fillStyle = template.colors.accent;
   
-  for (let i = 0; i < canvas.height; i += spacing) {
+  for (let i = 0; i < canvasHeight; i += spacing) {
     ctx.fillRect(4, i, perfWidth, perfHeight);
-    ctx.fillRect(canvas.width - 4 - perfWidth, i, perfWidth, perfHeight);
+    ctx.fillRect(canvasWidth - 4 - perfWidth, i, perfWidth, perfHeight);
   }
 }
 
-function drawNeonScanlines(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, template: PhotoStripTemplate): void {
+function drawNeonScanlines(
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number,
+  template: PhotoStripTemplate
+): void {
   ctx.strokeStyle = template.colors.primary + '15';
   ctx.lineWidth = 1;
   
-  for (let i = 0; i < canvas.height; i += 3) {
+  for (let i = 0; i < canvasHeight; i += 3) {
     ctx.beginPath();
     ctx.moveTo(0, i);
-    ctx.lineTo(canvas.width, i);
+    ctx.lineTo(canvasWidth, i);
     ctx.stroke();
   }
 }
 
-function drawPolaroidShadow(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
+function drawPolaroidShadow(
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number
+): void {
   ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
   ctx.shadowBlur = 10;
   ctx.shadowOffsetX = 3;
@@ -308,7 +532,7 @@ function drawPolaroidShadow(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasEle
   
   ctx.strokeStyle = '#E0E0E0';
   ctx.lineWidth = 1;
-  ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+  ctx.strokeRect(5, 5, canvasWidth - 10, canvasHeight - 10);
   
   ctx.shadowBlur = 0;
   ctx.shadowOffsetX = 0;

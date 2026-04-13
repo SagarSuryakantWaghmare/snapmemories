@@ -65,6 +65,7 @@ export interface ResultScreenProps {
   photos: (string | null)[];
   showPrinting: boolean;
   showFinalKiosk: boolean;
+  selectedFrame: Frame;
   currentFilter: FilterName;
   onFilterChange: (filter: FilterName) => void;
   onDownload: () => void;

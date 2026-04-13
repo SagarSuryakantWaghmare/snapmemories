@@ -407,6 +407,7 @@ export default function Home() {
           photos={filteredPhotos.some(p => p !== null) ? filteredPhotos : photos}
           showPrinting={showPrinting}
           showFinalKiosk={showFinalKiosk}
+          selectedFrame={FRAMES[currentFrameIndex]}
           currentFilter={currentFilter}
           onFilterChange={applyFilter}
           onDownload={handleDownload}

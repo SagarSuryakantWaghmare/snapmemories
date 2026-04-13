@@ -3,12 +3,14 @@
 import Image from 'next/image';
 import { ResultScreenProps } from '@/lib/types';
 import { FILTERS } from '@/lib/constants';
+import { HEART_CLIP_POLYGON } from '@/lib/frame-shapes';
 import FloatingNav from './FloatingNav';
 
 export default function ResultScreen({
   photos,
   showPrinting,
   showFinalKiosk,
+  selectedFrame,
   currentFilter,
   onFilterChange,
   onDownload,
@@ -17,6 +19,7 @@ export default function ResultScreen({
   onImageClick,
 }: ResultScreenProps) {
   const hasAnyPhoto = photos.some((photo) => photo !== null);
+  const framePreviewBorderWidth = Math.min(selectedFrame.borderWidth, 6);
 
   return (
     <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col overflow-hidden">
@@ -42,7 +45,9 @@ export default function ResultScreen({
             <header className="text-center">
               <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 font-semibold">Step 3 of 3</p>
               <h1 className="text-xl sm:text-2xl font-bold text-black mt-1">Your photo strip is ready</h1>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Tap any filled photo to preview it larger.</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                Frame: <span className="font-medium text-gray-700">{selectedFrame.name}</span> • Tap any filled photo to preview it larger.
+              </p>
             </header>
 
             <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center max-w-sm px-2">
@@ -64,38 +69,86 @@ export default function ResultScreen({
             </div>
 
             <div
-              className="bg-white border-2 border-black rounded-lg p-2 shadow-lg"
-              style={{ width: 'min(170px, 48vw)' }}
+              className="rounded-lg p-2 shadow-lg transition-colors"
+              style={{
+                width: 'min(190px, 52vw)',
+                background: selectedFrame.backgroundColor,
+                border:
+                  selectedFrame.shape === 'polaroid'
+                    ? `1px solid ${selectedFrame.borderColor}`
+                    : `${framePreviewBorderWidth}px solid ${selectedFrame.borderColor}`,
+              }}
             >
               <div className="flex flex-col gap-1">
-                {photos.map((photo, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => photo && onImageClick(photo)}
-                    disabled={!photo}
-                    aria-label={photo ? `Preview photo ${i + 1}` : `Photo slot ${i + 1} is empty`}
-                    className="relative w-full bg-gray-100 border border-gray-200 rounded overflow-hidden aspect-square disabled:cursor-default"
-                  >
-                    {photo ? (
-                      <>
-                        <Image
-                          src={photo}
-                          alt={`Photo ${i + 1}`}
-                          fill
-                          className="object-cover hover:opacity-90"
-                        />
-                        <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
-                          Zoom
-                        </span>
-                      </>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <span className="text-lg">{i + 1}</span>
+                {photos.map((photo, i) => {
+                  const isPolaroid = selectedFrame.shape === 'polaroid';
+                  const mediaStyle =
+                    selectedFrame.shape === 'heart'
+                      ? {
+                          clipPath: HEART_CLIP_POLYGON,
+                          border: `${Math.max(2, Math.min(selectedFrame.borderWidth, 4))}px solid ${selectedFrame.borderColor}`,
+                        }
+                      : selectedFrame.shape === 'circle'
+                        ? {
+                            borderRadius: '50%',
+                            border: `${Math.max(2, Math.min(selectedFrame.borderWidth, 4))}px solid ${selectedFrame.borderColor}`,
+                          }
+                        : {
+                            borderRadius: '2px',
+                            border:
+                              selectedFrame.shape === 'rectangle'
+                                ? `${Math.max(2, Math.min(selectedFrame.borderWidth, 4))}px solid ${selectedFrame.borderColor}`
+                                : '1px solid #E5E7EB',
+                          };
+
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => photo && onImageClick(photo)}
+                      disabled={!photo}
+                      aria-label={photo ? `Preview photo ${i + 1}` : `Photo slot ${i + 1} is empty`}
+                      className="w-full bg-transparent p-0 text-left disabled:cursor-default"
+                    >
+                      <div
+                        style={
+                          isPolaroid
+                            ? {
+                                background: selectedFrame.backgroundColor,
+                                border: `1px solid ${selectedFrame.borderColor}`,
+                                borderRadius: '2px',
+                                padding: `${Math.min(selectedFrame.borderWidth, 8)}px`,
+                                paddingBottom: `${Math.min(Math.round(selectedFrame.borderWidth * 1.6), 16)}px`,
+                              }
+                            : undefined
+                        }
+                      >
+                        <div
+                          className="relative w-full bg-gray-100 overflow-hidden aspect-square"
+                          style={mediaStyle}
+                        >
+                          {photo ? (
+                            <>
+                              <Image
+                                src={photo}
+                                alt={`Photo ${i + 1}`}
+                                fill
+                                className="object-cover hover:opacity-90"
+                              />
+                              <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
+                                Zoom
+                              </span>
+                            </>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                              <span className="text-lg">{i + 1}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
               <p className="text-[8px] sm:text-[9px] text-center text-gray-400 mt-1.5 tracking-wider">
                 snapmemories by sagar

@@ -3,6 +3,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { FrameSelectionProps, Frame } from '@/lib/types';
 import { FRAMES } from '@/lib/constants';
+import { HEART_CLIP_POLYGON } from '@/lib/frame-shapes';
 import Image from 'next/image';
 import FloatingNav from './FloatingNav';
 
@@ -257,28 +258,52 @@ export default function FrameSelection({
               }}
             >
               <div className="flex flex-col gap-0.5" style={{ width: '90px' }}>
-                {photos.map((photo, i) => (
-                  <div
-                    key={i}
-                    className="relative bg-gray-100 overflow-hidden"
-                    style={{
-                      aspectRatio: '1/1',
-                      borderRadius:
-                        selectedFrame.shape === 'circle' ? '50%' : selectedFrame.shape === 'heart' ? '0' : '2px',
-                    }}
-                  >
-                    {photo ? (
-                      <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <span className="text-xs">{i + 1}</span>
+                {photos.map((photo, i) => {
+                  const isPolaroid = selectedFrame.shape === 'polaroid';
+                  const shapeStyle =
+                    selectedFrame.shape === 'heart'
+                      ? { clipPath: HEART_CLIP_POLYGON }
+                      : { borderRadius: selectedFrame.shape === 'circle' ? '50%' : '2px' };
+
+                  return (
+                    <div key={i} className="w-full">
+                      <div
+                        className={isPolaroid ? 'w-full' : ''}
+                        style={
+                          isPolaroid
+                            ? {
+                                background: selectedFrame.backgroundColor,
+                                border: `1px solid ${selectedFrame.borderColor}`,
+                                borderRadius: '2px',
+                                padding: `${Math.min(selectedFrame.borderWidth, 6)}px`,
+                                paddingBottom: `${Math.min(Math.round(selectedFrame.borderWidth * 1.6), 12)}px`,
+                              }
+                            : undefined
+                        }
+                      >
+                        <div
+                          className="relative bg-gray-100 overflow-hidden"
+                          style={{
+                            aspectRatio: '1/1',
+                            ...shapeStyle,
+                          }}
+                        >
+                          {photo ? (
+                            <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                              <span className="text-xs">{i + 1}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
               <p className="text-[6px] text-center text-gray-400 mt-1 tracking-wider">snapmemories by sagar</p>
             </div>
+            <p className="text-[10px] text-gray-500">Downloaded strip will match this frame crop and shape.</p>
           </div>
         </div>
       </main>
