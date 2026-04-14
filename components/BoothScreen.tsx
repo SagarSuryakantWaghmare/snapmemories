@@ -234,7 +234,7 @@ export default function BoothScreen({
             <button
               type="button"
               onClick={onRecordClick}
-              disabled={recordDisabled || isCapturing || !!cameraError}
+              disabled={recordDisabled || isCapturing}
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black text-white flex items-center justify-center border-4 border-white shadow-2xl hover:bg-gray-800 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Capture photos"
             >

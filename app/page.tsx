@@ -50,40 +50,83 @@ export default function Home() {
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null!);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const cameraSessionIdRef = useRef(0);
 
   // Camera management
   const initCamera = useCallback(async () => {
+    const sessionId = ++cameraSessionIdRef.current;
     setIsCameraReady(false);
     setCameraError(null);
 
     try {
       const mediaStream = await startCamera();
-      setStream(mediaStream);
-      if (videoRef.current) {
-        const video = videoRef.current;
 
-        // Set srcObject first
-        video.srcObject = mediaStream;
-        
-        // Ensure video plays
-        try {
-          await video.play();
-        } catch (playError) {
-          console.log('Auto-play blocked, user interaction may be required:', playError);
+      if (cameraSessionIdRef.current !== sessionId) {
+        stopCamera(mediaStream);
+        return;
+      }
+
+      if (streamRef.current) {
+        stopCamera(streamRef.current);
+      }
+      streamRef.current = mediaStream;
+      setStream(mediaStream);
+
+      const video = videoRef.current;
+      if (!video) {
+        stopCamera(mediaStream);
+        streamRef.current = null;
+        setStream(null);
+        setCameraError('Camera started, but preview could not initialize. Please try again.');
+        return;
+      }
+
+      // Set srcObject first
+      video.srcObject = mediaStream;
+      
+      // Ensure video plays
+      try {
+        await video.play();
+      } catch (playError) {
+        console.log('Auto-play blocked, user interaction may be required:', playError);
+      }
+
+      const ready = await waitForVideoReady(video, 10000);
+      if (cameraSessionIdRef.current !== sessionId) {
+        stopCamera(mediaStream);
+        return;
+      }
+
+      setIsCameraReady(ready);
+
+      if (!ready) {
+        const readinessMessage = 'Camera stream started, but video is still warming up. Please wait a moment.';
+        console.warn(readinessMessage);
+        setCameraError(readinessMessage);
+
+        const eventuallyReady = await waitForVideoReady(video, 15000);
+        if (cameraSessionIdRef.current !== sessionId) {
+          stopCamera(mediaStream);
+          return;
         }
 
-        const ready = await waitForVideoReady(video, 5000);
-        setIsCameraReady(ready);
-
-        if (!ready) {
-          const readinessMessage = 'Camera stream started, but video is still warming up.';
-          console.warn(readinessMessage);
-          setCameraError(readinessMessage);
-        } else {
+        if (eventuallyReady) {
+          setIsCameraReady(true);
           setCameraError(null);
         }
+        return;
       }
+
+      setCameraError(null);
     } catch (error) {
+      if (cameraSessionIdRef.current !== sessionId) return;
+
+      if (streamRef.current) {
+        stopCamera(streamRef.current);
+        streamRef.current = null;
+      }
+      setStream(null);
       setIsCameraReady(false);
       setCameraError('Unable to access camera. Please check permissions or upload photos instead.');
       console.error('Failed to start camera:', error);
@@ -91,30 +134,59 @@ export default function Home() {
   }, []);
 
   const cleanupCamera = useCallback(() => {
+    cameraSessionIdRef.current += 1;
     setIsCameraReady(false);
-    if (stream) {
-      stopCamera(stream);
-      setStream(null);
+    if (streamRef.current) {
+      stopCamera(streamRef.current);
+      streamRef.current = null;
     }
+    setStream(null);
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-  }, [stream]);
+  }, []);
 
   // Start camera when entering booth screen
   useEffect(() => {
-    if (currentScreen === 'booth') {
-      initCamera();
-    } else {
+    if (currentScreen !== 'booth') {
       cleanupCamera();
+      return;
     }
-    
-    return () => {
-      if (currentScreen !== 'booth') {
-        cleanupCamera();
-      }
-    };
+
+    void initCamera();
+    return cleanupCamera;
   }, [currentScreen, initCamera, cleanupCamera]);
+
+  // Keep readiness in sync if the stream becomes usable after initial warmup checks.
+  useEffect(() => {
+    if (currentScreen !== 'booth' || isCameraReady || !stream || !videoRef.current) {
+      return;
+    }
+
+    const video = videoRef.current;
+    const markReadyIfAvailable = () => {
+      const ready = video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0;
+      if (ready) {
+        setIsCameraReady(true);
+        setCameraError(null);
+      }
+      return ready;
+    };
+
+    if (markReadyIfAvailable()) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      if (markReadyIfAvailable()) {
+        clearInterval(intervalId);
+      }
+    }, 200);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [currentScreen, isCameraReady, stream]);
 
   // Apply B&W filter to video
   useEffect(() => {
