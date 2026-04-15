@@ -140,7 +140,9 @@ export default function TemplateSelection({
           <button
             type="button"
             onClick={onContinue}
-            className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl"
+            className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl transition-colors min-h-12"
+            aria-label={`Continue with ${selectedTemplate.name} template`}
+            title={`Proceed with ${selectedTemplate.name}`}
           >
             Continue with {selectedTemplate.name} →
           </button>

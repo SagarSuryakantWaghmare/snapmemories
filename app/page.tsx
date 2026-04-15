@@ -7,6 +7,8 @@ import BoothScreen from '@/components/BoothScreen';
 import FrameSelection from '@/components/FrameSelection';
 import ResultScreen from '@/components/ResultScreen';
 import Modal from '@/components/Modal';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { Screen, FilterName } from '@/lib/types';
 import { PhotoStripTemplate, PHOTO_STRIP_TEMPLATES, DEFAULT_TEMPLATE } from '@/lib/templates';
 import { startCamera, stopCamera, captureVideoFrame, applyVideoFilter, waitForVideoReady } from '@/lib/camera';
@@ -432,68 +434,70 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full min-h-screen overflow-hidden bg-white">
-      <canvas ref={canvasRef} className="hidden" />
+    <ErrorBoundary>
+      <div className="w-full min-h-screen overflow-hidden bg-white">
+        <canvas ref={canvasRef} className="hidden" />
 
-      {currentScreen === 'home' && <HomeScreen onEnter={goToTemplateSelection} />}
+        {currentScreen === 'home' && <HomeScreen onEnter={goToTemplateSelection} />}
 
-      {currentScreen === 'templateSelection' && (
-        <TemplateSelection
-          templates={PHOTO_STRIP_TEMPLATES}
-          selectedTemplate={selectedTemplate}
-          onSelectTemplate={setSelectedTemplate}
-          onContinue={goToBooth}
-          onHome={goHome}
+        {currentScreen === 'templateSelection' && (
+          <TemplateSelection
+            templates={PHOTO_STRIP_TEMPLATES}
+            selectedTemplate={selectedTemplate}
+            onSelectTemplate={setSelectedTemplate}
+            onContinue={goToBooth}
+            onHome={goHome}
+          />
+        )}
+
+        {currentScreen === 'booth' && (
+          <BoothScreen
+            isBW={isBW}
+            isCameraReady={isCameraReady}
+            cameraError={cameraError}
+            onBWToggle={toggleBW}
+            onRecordClick={startPhotoSession}
+            onUpload={handleUpload}
+            onHome={goHome}
+            recordDisabled={!stream || !isCameraReady || isCapturing}
+            videoRef={videoRef}
+            photos={photos}
+            currentPhotoIndex={currentPhotoIndex}
+            isCapturing={isCapturing}
+          />
+        )}
+
+        {currentScreen === 'frameSelection' && (
+          <FrameSelection
+            photos={photos}
+            currentFrameIndex={currentFrameIndex}
+            onFrameChange={handleFrameChange}
+            onSelectFrame={handleSelectFrame}
+            onHome={goHome}
+          />
+        )}
+
+        {currentScreen === 'result' && (
+          <ResultScreen
+            photos={filteredPhotos.some(p => p !== null) ? filteredPhotos : photos}
+            showPrinting={showPrinting}
+            showFinalKiosk={showFinalKiosk}
+            selectedFrame={FRAMES[currentFrameIndex]}
+            currentFilter={currentFilter}
+            onFilterChange={applyFilter}
+            onDownload={handleDownload}
+            onRetake={goToBooth}
+            onHome={goHome}
+            onImageClick={handleImageClick}
+          />
+        )}
+
+        <Modal
+          isOpen={modalOpen}
+          imageSrc={modalImage}
+          onClose={() => setModalOpen(false)}
         />
-      )}
-
-      {currentScreen === 'booth' && (
-        <BoothScreen
-          isBW={isBW}
-          isCameraReady={isCameraReady}
-          cameraError={cameraError}
-          onBWToggle={toggleBW}
-          onRecordClick={startPhotoSession}
-          onUpload={handleUpload}
-          onHome={goHome}
-          recordDisabled={!stream || !isCameraReady || isCapturing}
-          videoRef={videoRef}
-          photos={photos}
-          currentPhotoIndex={currentPhotoIndex}
-          isCapturing={isCapturing}
-        />
-      )}
-
-      {currentScreen === 'frameSelection' && (
-        <FrameSelection
-          photos={photos}
-          currentFrameIndex={currentFrameIndex}
-          onFrameChange={handleFrameChange}
-          onSelectFrame={handleSelectFrame}
-          onHome={goHome}
-        />
-      )}
-
-      {currentScreen === 'result' && (
-        <ResultScreen
-          photos={filteredPhotos.some(p => p !== null) ? filteredPhotos : photos}
-          showPrinting={showPrinting}
-          showFinalKiosk={showFinalKiosk}
-          selectedFrame={FRAMES[currentFrameIndex]}
-          currentFilter={currentFilter}
-          onFilterChange={applyFilter}
-          onDownload={handleDownload}
-          onRetake={goToBooth}
-          onHome={goHome}
-          onImageClick={handleImageClick}
-        />
-      )}
-
-      <Modal
-        isOpen={modalOpen}
-        imageSrc={modalImage}
-        onClose={() => setModalOpen(false)}
-      />
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

@@ -57,11 +57,12 @@ export default function ResultScreen({
                   type="button"
                   onClick={() => onFilterChange(filter.value)}
                   aria-pressed={currentFilter === filter.value}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium transition-all text-xs sm:text-sm ${
+                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium transition-all text-xs sm:text-sm min-h-10 ${
                     currentFilter === filter.value
                       ? 'bg-black text-white shadow-md'
                       : 'bg-white/85 text-gray-700 hover:bg-white border border-gray-200 hover:border-gray-300'
                   }`}
+                  title={`Apply ${filter.name} filter`}
                 >
                   {filter.name}
                 </button>
@@ -165,7 +166,9 @@ export default function ResultScreen({
           <button
             type="button"
             onClick={onRetake}
-            className="flex-1 px-4 py-2.5 text-sm font-bold bg-white text-black border border-black/20 rounded-full hover:bg-gray-50 active:scale-[0.98] shadow"
+            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-white text-black border border-black/20 rounded-full hover:bg-gray-50 active:scale-[0.98] shadow transition-colors min-h-11"
+            aria-label="Retake photos with new captures"
+            title="Go back and capture new photos"
           >
             Retake
           </button>
@@ -173,7 +176,9 @@ export default function ResultScreen({
             type="button"
             onClick={onDownload}
             disabled={!hasAnyPhoto}
-            className="flex-1 px-4 py-2.5 text-sm font-bold bg-black text-white rounded-full hover:bg-gray-800 active:scale-[0.98] shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-black text-white rounded-full hover:bg-gray-800 active:scale-[0.98] shadow disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-11"
+            aria-label={hasAnyPhoto ? 'Download your photo strip' : 'Download disabled - no photos available'}
+            title={hasAnyPhoto ? 'Download as image' : 'No photos to download'}
           >
             Download
           </button>

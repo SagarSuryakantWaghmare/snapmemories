@@ -83,21 +83,23 @@ export default function BoothScreen({
         <button
           type="button"
           onClick={onHome}
-          className="pointer-events-auto h-10 w-10 sm:h-11 sm:w-11 rounded-full border border-white/30 bg-black/75 text-white backdrop-blur-md shadow-lg hover:bg-black/90 active:scale-95 flex items-center justify-center"
-          aria-label="Go to home"
+          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-white/30 bg-black/75 text-white backdrop-blur-md shadow-lg hover:bg-black/90 active:scale-95 flex items-center justify-center transition-colors"
+          aria-label="Go back to home screen"
+          title="Go home"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
         </button>
 
         <div
-          className={`pointer-events-auto rounded-full border px-3 py-1.5 text-[11px] sm:text-xs font-medium backdrop-blur ${
+          className={`pointer-events-auto rounded-full border px-3 py-1.5 text-[11px] sm:text-xs font-medium backdrop-blur transition-colors ${
             cameraError ? 'bg-red-50 text-red-700 border-red-200' : 'bg-white/95 text-gray-700 border-gray-200'
           }`}
           aria-live="polite"
+          aria-label={`Camera status: ${cameraError ? 'issue detected' : isCameraReady ? 'ready' : 'initializing'}`}
         >
-          {cameraError ? 'Camera issue' : isCameraReady ? 'Camera ready' : 'Initializing camera'}
+          {cameraError ? '⚠️ Camera issue' : isCameraReady ? '✓ Camera ready' : '⏳ Initializing...'}
         </div>
       </div>
 
@@ -221,10 +223,11 @@ export default function BoothScreen({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="h-12 sm:h-14 min-w-[4.5rem] sm:min-w-[5rem] rounded-2xl border border-black/15 bg-white text-black text-[11px] sm:text-xs font-semibold shadow hover:bg-gray-50 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5"
-            aria-label="Upload photos from device"
+            className="h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border border-black/15 bg-white text-black text-[11px] sm:text-xs font-semibold shadow hover:bg-gray-50 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors"
+            aria-label="Upload photos from your device"
+            title="Upload photos"
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
             Upload
@@ -235,13 +238,14 @@ export default function BoothScreen({
               type="button"
               onClick={onRecordClick}
               disabled={recordDisabled || isCapturing}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black text-white flex items-center justify-center border-4 border-white shadow-2xl hover:bg-gray-800 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Capture photos"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black text-white flex items-center justify-center border-4 border-white shadow-2xl hover:bg-gray-800 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              aria-label={isCapturing ? `Capturing photo ${activeCaptureStep} of ${PHOTO_COUNT}` : 'Start capturing photos'}
+              title={isCapturing ? `Capturing ${activeCaptureStep}/${PHOTO_COUNT}` : 'Capture'}
             >
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white" aria-hidden="true" />
             </button>
-            <p className="text-xs sm:text-sm text-black font-bold bg-white/95 px-2.5 py-0.5 rounded-full shadow">
-              {isCapturing ? `Capturing ${activeCaptureStep}/${PHOTO_COUNT}` : 'Capture'}
+            <p className="text-xs sm:text-sm text-black font-bold bg-white/95 px-3 py-1 rounded-full shadow">
+              {isCapturing ? `${activeCaptureStep}/${PHOTO_COUNT}` : 'Capture'}
             </p>
           </div>
 
@@ -249,12 +253,13 @@ export default function BoothScreen({
             type="button"
             onClick={() => onBWToggle(!isBW)}
             aria-pressed={isBW}
-            className={`h-12 sm:h-14 min-w-[4.5rem] sm:min-w-[5rem] rounded-2xl border text-[11px] sm:text-xs font-semibold shadow active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 ${
+            className={`h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border text-[11px] sm:text-xs font-semibold shadow active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors ${
               isBW ? 'bg-black text-white border-black' : 'bg-white text-black border-black/15 hover:bg-gray-50'
             }`}
-            aria-label="Toggle black and white mode"
+            aria-label={`Toggle ${isBW ? 'color' : 'black and white'} mode`}
+            title={isBW ? 'Switch to color' : 'Switch to B&W'}
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4a9 9 0 018 14.9A9 9 0 117 4z" />
             </svg>
             {isBW ? 'B&W' : 'Color'}

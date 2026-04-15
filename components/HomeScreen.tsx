@@ -19,7 +19,7 @@ export default function HomeScreen({ onEnter }: HomeScreenProps) {
         </p>
 
         <div className="mx-auto mb-4 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border border-black/15 bg-white shadow-sm">
-          <svg viewBox="0 0 120 120" className="text-black w-12 h-12 sm:w-14 sm:h-14" aria-hidden>
+          <svg viewBox="0 0 120 120" className="text-black w-12 h-12 sm:w-14 sm:h-14" aria-hidden="true">
             <rect x="20" y="40" width="80" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="3" />
             <circle cx="60" cy="70" r="20" fill="none" stroke="currentColor" strokeWidth="3" />
             <circle cx="60" cy="70" r="12" fill="currentColor" opacity="0.12" />
@@ -29,24 +29,26 @@ export default function HomeScreen({ onEnter }: HomeScreenProps) {
         </div>
 
         <div className="mb-4 flex flex-wrap justify-center gap-2 text-[11px] sm:text-xs text-gray-600">
-          <span className="rounded-full bg-gray-100 px-2.5 py-1">4 auto shots</span>
-          <span className="rounded-full bg-gray-100 px-2.5 py-1">Live filters</span>
-          <span className="rounded-full bg-gray-100 px-2.5 py-1">Instant download</span>
+          <span className="rounded-full bg-gray-100 px-2.5 py-1">✓ 4 auto shots</span>
+          <span className="rounded-full bg-gray-100 px-2.5 py-1">✨ Live filters</span>
+          <span className="rounded-full bg-gray-100 px-2.5 py-1">⬇️ Instant download</span>
         </div>
 
         <button
           type="button"
           onClick={onEnter}
-          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2"
+          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2 transition-colors min-h-12"
+          aria-label="Start the photo booth application"
+          title="Start capturing photos"
         >
           Start Photo Booth
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
         <p className="mt-4 text-xs text-gray-500">
-          Camera or upload • 4 automatic shots • instant download
+          📷 Camera or upload • 4 automatic shots • instant download
         </p>
       </section>
 
