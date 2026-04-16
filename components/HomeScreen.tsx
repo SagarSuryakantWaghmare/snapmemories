@@ -37,7 +37,7 @@ export default function HomeScreen({ onEnter }: HomeScreenProps) {
         <button
           type="button"
           onClick={onEnter}
-          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2 transition-colors min-h-12"
+          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-blue-600 text-white text-sm sm:text-base font-bold rounded-full hover:bg-blue-700 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2 transition-colors min-h-12"
           aria-label="Start the photo booth application"
           title="Start capturing photos"
         >

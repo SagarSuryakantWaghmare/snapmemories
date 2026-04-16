@@ -44,7 +44,7 @@ export default function TemplateSelection({
                   aria-pressed={isSelected}
                   aria-label={`Select ${template.name} template`}
                   className={`relative group bg-white rounded-xl overflow-hidden border-2 transition-all duration-200 hover:shadow-lg active:scale-[0.98] ${
-                    isSelected ? 'border-black shadow-md scale-[1.01]' : 'border-gray-200'
+                    isSelected ? 'border-blue-600 shadow-md scale-[1.01]' : 'border-gray-200'
                   }`}
                 >
                   <div
@@ -126,7 +126,7 @@ export default function TemplateSelection({
                   </div>
 
                   {isSelected && (
-                    <div className="absolute top-2 right-2 rounded-full bg-black text-white text-[10px] px-2 py-0.5 shadow">
+                    <div className="absolute top-2 right-2 rounded-full bg-blue-600 text-white text-[10px] px-2 py-0.5 shadow">
                       Selected
                     </div>
                   )}
@@ -140,7 +140,7 @@ export default function TemplateSelection({
           <button
             type="button"
             onClick={onContinue}
-            className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl transition-colors min-h-12"
+            className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-blue-600 text-white text-sm sm:text-base font-bold rounded-full hover:bg-blue-700 active:scale-[0.98] shadow-xl transition-colors min-h-12"
             aria-label={`Continue with ${selectedTemplate.name} template`}
             title={`Proceed with ${selectedTemplate.name}`}
           >

@@ -62,7 +62,7 @@ export default function FrameSelection({
 
     const baseClasses = `relative transition-all duration-300 ${
       isSelected
-        ? 'ring-2 ring-black scale-110 shadow-xl z-10'
+        ? 'ring-2 ring-blue-600 scale-110 shadow-xl z-10'
         : 'opacity-60 hover:opacity-80 hover:scale-105 shadow-md'
     }`;
 
@@ -208,7 +208,7 @@ export default function FrameSelection({
                 >
                   {renderFramePreview(frame, currentFrameIndex === index, currentFrameIndex === index ? 'large' : 'small')}
                   <span className={`text-[10px] sm:text-xs font-medium transition-all ${
-                    currentFrameIndex === index ? 'text-black scale-105' : 'text-gray-400'
+                    currentFrameIndex === index ? 'text-blue-600 scale-105' : 'text-gray-400'
                   }`}>
                     {frame.name}
                   </span>
@@ -237,7 +237,7 @@ export default function FrameSelection({
                 aria-label={`Go to frame ${index + 1}`}
                 aria-pressed={currentFrameIndex === index}
                 className={`h-2 rounded-full transition-all ${
-                  currentFrameIndex === index ? 'bg-black w-4' : 'bg-gray-300 hover:bg-gray-400 w-2'
+                  currentFrameIndex === index ? 'bg-blue-600 w-4' : 'bg-gray-300 hover:bg-gray-400 w-2'
                 }`}
               />
             ))}
@@ -312,7 +312,7 @@ export default function FrameSelection({
         <button
           type="button"
           onClick={onSelectFrame}
-          className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl"
+          className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-blue-600 text-white text-sm sm:text-base font-bold rounded-full hover:bg-blue-700 active:scale-[0.98] shadow-xl"
         >
           Continue to filters →
         </button>

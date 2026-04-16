@@ -13,7 +13,7 @@ export default function FloatingNav({ onBack, showBack = false }: FloatingNavPro
       <button
         type="button"
         onClick={onBack}
-        className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-white/30 bg-black/75 text-white backdrop-blur-md shadow-lg hover:bg-black/90 active:scale-95 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-white/50"
+        className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-blue-200 bg-blue-50 text-blue-600 backdrop-blur-md shadow-lg hover:bg-blue-100 active:scale-95 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-blue-400"
         aria-label="Go back to home screen"
         title="Back to home"
       >
