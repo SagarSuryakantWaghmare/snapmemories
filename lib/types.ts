@@ -69,6 +69,7 @@ export interface ResultScreenProps {
   currentFilter: FilterName;
   onFilterChange: (filter: FilterName) => void;
   onDownload: () => void;
+  isDownloading?: boolean;
   onRetake: () => void;
   onHome: () => void;
   onImageClick: (src: string) => void;
