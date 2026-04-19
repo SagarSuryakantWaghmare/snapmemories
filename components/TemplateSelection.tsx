@@ -19,15 +19,15 @@ export default function TemplateSelection({
   onHome,
 }: TemplateSelectionProps) {
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col overflow-hidden">
+    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col overflow-hidden">
       <FloatingNav showBack={!!onHome} onBack={onHome} />
 
       <main className="flex h-full min-h-screen flex-col">
         <header className="pt-14 sm:pt-16 pb-3 text-center px-4">
-          <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 font-semibold">Step 1 of 3</p>
-          <h1 className="text-xl sm:text-2xl font-bold text-black mt-1">Choose your style</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
-            Selected: <span className="font-medium text-gray-700">{selectedTemplate.name}</span> - {selectedTemplate.description}
+          <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400 font-semibold">Step 1 of 3</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-black dark:text-white mt-1">Choose your style</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Selected: <span className="font-medium text-gray-700 dark:text-gray-300">{selectedTemplate.name}</span> - {selectedTemplate.description}
           </p>
         </header>
 
@@ -43,8 +43,8 @@ export default function TemplateSelection({
                   onClick={() => onSelectTemplate(template)}
                   aria-pressed={isSelected}
                   aria-label={`Select ${template.name} template`}
-                  className={`relative group bg-white rounded-xl overflow-hidden border-2 transition-all duration-200 hover:shadow-lg active:scale-[0.98] ${
-                    isSelected ? 'border-blue-600 shadow-md scale-[1.01]' : 'border-gray-200'
+                  className={`relative group bg-white dark:bg-gray-800 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:shadow-lg active:scale-[0.98] ${
+                    isSelected ? 'border-blue-600 dark:border-blue-500 shadow-md scale-[1.01]' : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
                   <div
@@ -55,14 +55,14 @@ export default function TemplateSelection({
                       {[1, 2, 3, 4].map((index) => (
                         <div
                           key={index}
-                          className="aspect-square bg-gray-200 rounded-sm flex items-center justify-center"
+                          className="aspect-square bg-gray-200 dark:bg-gray-600 rounded-sm flex items-center justify-center"
                           style={{
                             borderWidth: Math.max(1, template.borderStyle.width / 3),
                             borderColor: template.borderStyle.color,
                             borderStyle: template.borderStyle.pattern === 'solid' ? 'solid' : 'dashed',
                           }}
                         >
-                          <span className="text-[8px] text-gray-400">{index}</span>
+                          <span className="text-[8px] text-gray-400 dark:text-gray-500">{index}</span>
                         </div>
                       ))}
                     </div>
@@ -114,19 +114,19 @@ export default function TemplateSelection({
                     )}
                   </div>
 
-                  <div className="p-2.5 border-t border-gray-100 bg-white text-left">
-                    <h3 className="font-semibold text-xs sm:text-sm text-black truncate">{template.name}</h3>
-                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">{template.description}</p>
+                  <div className="p-2.5 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 text-left">
+                    <h3 className="font-semibold text-xs sm:text-sm text-black dark:text-white truncate">{template.name}</h3>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{template.description}</p>
 
                     <div className="flex gap-1 mt-1.5">
-                      <div className="w-3 h-3 rounded-full border border-gray-200" style={{ background: template.colors.primary }} />
-                      <div className="w-3 h-3 rounded-full border border-gray-200" style={{ background: template.colors.secondary }} />
-                      <div className="w-3 h-3 rounded-full border border-gray-200" style={{ background: template.colors.accent }} />
+                      <div className="w-3 h-3 rounded-full border border-gray-200 dark:border-gray-700" style={{ background: template.colors.primary }} />
+                      <div className="w-3 h-3 rounded-full border border-gray-200 dark:border-gray-700" style={{ background: template.colors.secondary }} />
+                      <div className="w-3 h-3 rounded-full border border-gray-200 dark:border-gray-700" style={{ background: template.colors.accent }} />
                     </div>
                   </div>
 
                   {isSelected && (
-                    <div className="absolute top-2 right-2 rounded-full bg-blue-600 text-white text-[10px] px-2 py-0.5 shadow">
+                    <div className="absolute top-2 right-2 rounded-full bg-blue-600 dark:bg-blue-700 text-white text-[10px] px-2 py-0.5 shadow">
                       Selected
                     </div>
                   )}
@@ -136,11 +136,11 @@ export default function TemplateSelection({
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
+        <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent dark:from-gray-800 dark:via-gray-800/95 dark:to-transparent backdrop-blur-sm border-t border-black/5 dark:border-white/10">
           <button
             type="button"
             onClick={onContinue}
-            className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-blue-600 text-white text-sm sm:text-base font-bold rounded-full hover:bg-blue-700 active:scale-[0.98] shadow-xl transition-colors min-h-12"
+            className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-blue-600 dark:bg-blue-700 text-white text-sm sm:text-base font-bold rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 active:scale-[0.98] shadow-xl transition-colors min-h-12"
             aria-label={`Continue with ${selectedTemplate.name} template`}
             title={`Proceed with ${selectedTemplate.name}`}
           >

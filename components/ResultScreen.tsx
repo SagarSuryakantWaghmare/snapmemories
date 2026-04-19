@@ -23,13 +23,13 @@ export default function ResultScreen({
   const framePreviewBorderWidth = Math.min(selectedFrame.borderWidth, 6);
 
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col overflow-hidden">
+    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col overflow-hidden">
       <FloatingNav showBack onBack={onHome} />
 
       <main className="flex-1 flex flex-col items-center justify-start sm:justify-center gap-3 p-4 pt-14 sm:pt-16 pb-28 sm:pb-32 overflow-auto">
         {/* Processing animation */}
         {showPrinting && (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/10 bg-white px-6 py-5 shadow-md">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-gray-800 px-6 py-5 shadow-md dark:shadow-lg">
             <svg width="64" height="64" viewBox="0 0 100 100" className="animate-pulse" aria-hidden>
               <rect x="10" y="30" width="80" height="50" rx="5" fill="none" stroke="#111" strokeWidth="2" />
               <rect x="20" y="40" width="60" height="30" rx="3" fill="#F3F4F6" />
@@ -38,15 +38,15 @@ export default function ResultScreen({
                 <animate attributeName="y" values="80;60" dur="1.5s" repeatCount="indefinite" />
               </rect>
             </svg>
-            <p className="text-sm sm:text-base font-medium text-gray-700">Processing your photos…</p>
+            <p className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300">Processing your photos…</p>
           </div>
         )}
 
         {/* Transitioning state — neither printing nor kiosk shown yet */}
         {!showPrinting && !showFinalKiosk && (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/10 bg-white px-6 py-5 shadow-md">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-gray-800 px-6 py-5 shadow-md dark:shadow-lg">
             <svg
-              className="w-10 h-10 animate-spin text-blue-600"
+              className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -58,7 +58,7 @@ export default function ResultScreen({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <p className="text-sm text-gray-600 font-medium">Preparing your strip…</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">Preparing your strip…</p>
           </div>
         )}
 
@@ -66,10 +66,10 @@ export default function ResultScreen({
         {showFinalKiosk && (
           <>
             <header className="text-center">
-              <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 font-semibold">Step 3 of 3</p>
-              <h1 className="text-xl sm:text-2xl font-bold text-black mt-1">Your photo strip is ready</h1>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                Frame: <span className="font-medium text-gray-700">{selectedFrame.name}</span> • Tap any photo to preview larger.
+              <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400 font-semibold">Step 3 of 3</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-black dark:text-white mt-1">Your photo strip is ready</h1>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Frame: <span className="font-medium text-gray-700 dark:text-gray-300">{selectedFrame.name}</span> • Tap any photo to preview larger.
               </p>
             </header>
 
@@ -83,8 +83,8 @@ export default function ResultScreen({
                   onClick={() => onFilterChange(filter.value)}
                   aria-pressed={currentFilter === filter.value}
                   className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium transition-all text-xs sm:text-sm min-h-10 ${currentFilter === filter.value
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-white/85 text-gray-700 hover:bg-white border border-gray-200 hover:border-gray-300'
+                      ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
+                      : 'bg-white/85 dark:bg-gray-700/85 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                     }`}
                   title={`Apply ${filter.name} filter`}
                 >
@@ -151,7 +151,7 @@ export default function ResultScreen({
                         }
                       >
                         <div
-                          className="relative w-full bg-gray-100 overflow-hidden aspect-square"
+                          className="relative w-full bg-gray-100 dark:bg-gray-700 overflow-hidden aspect-square"
                           style={mediaStyle}
                         >
                           {photo ? (
@@ -167,7 +167,7 @@ export default function ResultScreen({
                               </span>
                             </>
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                               <span className="text-lg">{i + 1}</span>
                             </div>
                           )}
@@ -177,13 +177,13 @@ export default function ResultScreen({
                   );
                 })}
               </div>
-              <p className="text-[8px] sm:text-[9px] text-center text-gray-400 mt-1.5 tracking-wider">
+              <p className="text-[8px] sm:text-[9px] text-center text-gray-400 dark:text-gray-500 mt-1.5 tracking-wider">
                 snapmemories by sagar
               </p>
             </div>
 
             {!hasAnyPhoto && (
-              <p className="text-xs text-red-600 text-center px-4">
+              <p className="text-xs text-red-600 dark:text-red-400 text-center px-4">
                 No photos available. Please retake to capture again.
               </p>
             )}
@@ -192,13 +192,13 @@ export default function ResultScreen({
       </main>
 
       {/* Bottom action bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent dark:from-gray-800 dark:via-gray-800/95 dark:to-transparent backdrop-blur-sm border-t border-black/5 dark:border-white/10">
         <div className="mx-auto flex max-w-md gap-2">
           <button
             type="button"
             id="retake-btn"
             onClick={onRetake}
-            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-full hover:bg-blue-100 active:scale-[0.98] shadow transition-colors min-h-11"
+            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/60 active:scale-[0.98] shadow transition-colors min-h-11"
             aria-label="Retake photos with new captures"
             title="Go back and capture new photos"
           >
@@ -209,7 +209,7 @@ export default function ResultScreen({
             id="download-btn"
             onClick={onDownload}
             disabled={!hasAnyPhoto || isDownloading}
-            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-blue-600 text-white rounded-full hover:bg-blue-700 active:scale-[0.98] shadow disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-11 inline-flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-blue-600 dark:bg-blue-700 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 active:scale-[0.98] shadow transition-colors min-h-11 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={
               isDownloading
                 ? 'Downloading…'

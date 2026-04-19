@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { AlertTriangle, Check, Clock } from 'lucide-react';
 import { BoothScreenProps } from '@/lib/types';
 import { PHOTO_COUNT } from '@/lib/constants';
 
@@ -71,14 +72,14 @@ export default function BoothScreen({
   const videoFilter = isBW ? 'grayscale(1) contrast(1.1)' : 'none';
 
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-br from-white to-gray-100 flex flex-col overflow-hidden relative">
+    <div className="w-full h-full min-h-screen bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 flex flex-col overflow-hidden relative">
       {/* Top bar */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between p-3 sm:p-4 safe-top pointer-events-none">
         <button
           type="button"
           id="booth-home-btn"
           onClick={onHome}
-          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-blue-200 bg-blue-50 text-blue-600 backdrop-blur-md shadow-lg hover:bg-blue-100 active:scale-95 flex items-center justify-center transition-colors"
+          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 backdrop-blur-md shadow-lg hover:bg-blue-100 dark:hover:bg-blue-900/60 active:scale-95 flex items-center justify-center transition-colors"
           aria-label="Go back to home screen"
           title="Go home"
         >
@@ -88,17 +89,18 @@ export default function BoothScreen({
         </button>
 
         <div
-          className={`pointer-events-auto rounded-full border px-3 py-1.5 text-[11px] sm:text-xs font-medium backdrop-blur transition-colors ${cameraError
-              ? 'bg-red-50 text-red-700 border-red-200'
+          className={`pointer-events-auto rounded-full border px-3 py-1.5 text-[11px] sm:text-xs font-medium backdrop-blur transition-colors inline-flex items-center gap-1.5 ${cameraError
+              ? 'bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
               : isCameraReady
-                ? 'bg-green-50 text-green-700 border-green-200'
-                : 'bg-white/95 text-gray-700 border-gray-200'
+                ? 'bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
+                : 'bg-white/95 dark:bg-gray-800/95 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
             }`}
           aria-live="polite"
           role="status"
           aria-label={`Camera status: ${cameraError ? 'error' : isCameraReady ? 'ready' : 'initializing'}`}
         >
-          {cameraError ? '⚠️ Camera issue' : isCameraReady ? '✓ Camera ready' : '⏳ Initializing…'}
+          {cameraError ? <AlertTriangle className="w-4 h-4" /> : isCameraReady ? <Check className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
+          {cameraError ? 'Camera issue' : isCameraReady ? 'Camera ready' : 'Initializing…'}
         </div>
       </div>
 
@@ -128,9 +130,9 @@ export default function BoothScreen({
 
         {/* Desktop live preview */}
         <div className="shrink-0 hidden md:block">
-          <p className="text-xs font-semibold text-gray-700 text-center mb-1">Live preview</p>
+          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center mb-1">Live preview</p>
           <div
-            className="bg-white border-2 border-black rounded-lg p-1.5 shadow-lg overflow-hidden"
+            className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-1.5 shadow-lg overflow-hidden"
             style={{ width: 'min(300px, 38vw)', aspectRatio: '1/1' }}
           >
             {isCameraReady ? (
@@ -144,21 +146,19 @@ export default function BoothScreen({
                 aria-label="Live camera preview"
               />
             ) : (
-              <div className="w-full h-full bg-gray-100 rounded flex flex-col items-center justify-center gap-2">
+              <div className="w-full h-full bg-gray-100 dark:bg-gray-700 rounded flex flex-col items-center justify-center gap-2">
                 {cameraError ? (
                   <>
-                    <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                    </svg>
-                    <p className="text-xs text-center text-red-600 px-2">Camera unavailable</p>
+                    <AlertTriangle className="w-8 h-8 text-red-400" />
+                    <p className="text-xs text-center text-red-600 dark:text-red-400 px-2">Camera unavailable</p>
                   </>
                 ) : (
                   <>
-                    <svg className="w-6 h-6 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg className="w-6 h-6 animate-spin text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.25" />
                       <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <p className="text-xs text-gray-500">Starting camera…</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Starting camera…</p>
                   </>
                 )}
               </div>
@@ -169,21 +169,21 @@ export default function BoothScreen({
         {/* Strip preview column */}
         <div className="shrink-0">
           <div className="mb-2 flex items-center justify-between px-1">
-            <p className="text-xs font-semibold text-gray-700">Strip preview</p>
-            <p className="text-[11px] text-gray-500">
+            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">Strip preview</p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400">
               {completedPhotos}/{PHOTO_COUNT} captured
             </p>
           </div>
 
           <div
-            className="bg-white border-2 border-black rounded-lg p-1.5 shadow-lg"
+            className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-1.5 shadow-lg"
             style={{ width: 'min(140px, 40vw)' }}
           >
             <div className="flex flex-col gap-0.5">
               {Array.from({ length: PHOTO_COUNT }, (_, index) => (
                 <div
                   key={index}
-                  className="relative bg-gray-100 border border-gray-200 rounded overflow-hidden"
+                  className="relative bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded overflow-hidden"
                   style={{ width: '100%', aspectRatio: '1/1' }}
                   id={`photo-cell-${index}`}
                 >
@@ -212,7 +212,7 @@ export default function BoothScreen({
 
                   {/* Empty slot placeholder */}
                   {!photos[index] && (index > 0 || isCapturing) && (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
                       <span className="text-lg sm:text-xl font-bold">{index + 1}</span>
                     </div>
                   )}
@@ -238,12 +238,12 @@ export default function BoothScreen({
                 </div>
               ))}
             </div>
-            <p className="text-[7px] sm:text-[8px] text-center text-gray-400 mt-1 tracking-wider">
+            <p className="text-[7px] sm:text-[8px] text-center text-gray-400 dark:text-gray-500 mt-1 tracking-wider">
               snapmemories by sagar
             </p>
           </div>
 
-          <p className="mt-2 text-center text-[11px] text-gray-500 max-w-[140px] sm:max-w-[160px] leading-tight">
+          <p className="mt-2 text-center text-[11px] text-gray-500 dark:text-gray-400 max-w-[140px] sm:max-w-[160px] leading-tight">
             {cameraError
               ? 'Camera unavailable — use Upload instead.'
               : 'Photos fill automatically as each shot is taken.'}
@@ -252,14 +252,14 @@ export default function BoothScreen({
       </main>
 
       {/* Bottom controls */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 bg-gradient-to-t from-white via-white/95 to-white/70 px-4 pt-2.5 pb-3 safe-bottom backdrop-blur">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 dark:border-white/10 bg-gradient-to-t from-white via-white/95 to-white/70 dark:from-gray-800 dark:via-gray-800/95 dark:to-gray-800/70 px-4 pt-2.5 pb-3 safe-bottom backdrop-blur">
         <div className="mx-auto flex w-full max-w-md items-end justify-between gap-3">
           {/* Upload button */}
           <button
             type="button"
             id="upload-btn"
             onClick={() => fileInputRef.current?.click()}
-            className="h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border border-blue-200 bg-blue-50 text-blue-700 text-[11px] sm:text-xs font-semibold shadow hover:bg-blue-100 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors"
+            className="h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-[11px] sm:text-xs font-semibold shadow hover:bg-blue-100 dark:hover:bg-blue-900/60 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors"
             aria-label="Upload photos from your device"
             title="Upload photos instead"
           >
@@ -276,7 +276,7 @@ export default function BoothScreen({
               id="capture-btn"
               onClick={onRecordClick}
               disabled={recordDisabled}
-              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full text-white flex items-center justify-center border-4 border-white shadow-2xl active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all ${isCapturing ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-700'
+              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full text-white flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-2xl active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all ${isCapturing ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'
                 }`}
               aria-label={
                 isCapturing
@@ -293,10 +293,10 @@ export default function BoothScreen({
                   <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
               ) : (
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white" aria-hidden="true" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-gray-200" aria-hidden="true" />
               )}
             </button>
-            <p className="text-xs sm:text-sm text-black font-bold bg-white/95 px-3 py-1 rounded-full shadow">
+            <p className="text-xs sm:text-sm text-black dark:text-white font-bold bg-white/95 dark:bg-gray-800/95 px-3 py-1 rounded-full shadow">
               {isCapturing ? `${activeCaptureStep}/${PHOTO_COUNT}` : 'Capture'}
             </p>
           </div>
@@ -308,8 +308,8 @@ export default function BoothScreen({
             onClick={() => onBWToggle(!isBW)}
             aria-pressed={isBW}
             className={`h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border text-[11px] sm:text-xs font-semibold shadow active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors ${isBW
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                ? 'bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700'
+                : 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60'
               }`}
             aria-label={`Switch to ${isBW ? 'color' : 'black & white'} mode`}
             title={isBW ? 'Switch to color' : 'Switch to B&W'}
@@ -327,10 +327,10 @@ export default function BoothScreen({
             <div
               key={index}
               className={`h-1.5 rounded-full transition-all ${index < completedPhotos
-                  ? 'w-6 bg-blue-600'
+                  ? 'w-6 bg-blue-600 dark:bg-blue-500'
                   : index === currentPhotoIndex && isCapturing
-                    ? 'w-5 bg-blue-400'
-                    : 'w-3 bg-gray-300'
+                    ? 'w-5 bg-blue-400 dark:bg-blue-400'
+                    : 'w-3 bg-gray-300 dark:bg-gray-600'
                 }`}
               aria-hidden="true"
             />
@@ -339,7 +339,7 @@ export default function BoothScreen({
 
         {/* Status message */}
         <p
-          className={`mt-2 text-center text-[11px] font-medium ${cameraError ? 'text-red-600' : 'text-gray-500'}`}
+          className={`mt-2 text-center text-[11px] font-medium ${cameraError ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}
           aria-live="polite"
           role="status"
         >
