@@ -72,14 +72,14 @@ export default function BoothScreen({
   const videoFilter = isBW ? 'grayscale(1) contrast(1.1)' : 'none';
 
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 flex flex-col overflow-hidden relative">
+    <div className="w-full h-full min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 flex flex-col overflow-hidden relative">
       {/* Top bar */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between p-3 sm:p-4 safe-top pointer-events-none">
         <button
           type="button"
           id="booth-home-btn"
           onClick={onHome}
-          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 backdrop-blur-md shadow-lg hover:bg-blue-100 dark:hover:bg-blue-900/60 active:scale-95 flex items-center justify-center transition-colors"
+          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 backdrop-blur-md shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 flex items-center justify-center transition-colors"
           aria-label="Go back to home screen"
           title="Go home"
         >
@@ -233,7 +233,7 @@ export default function BoothScreen({
 
                   {/* Active capture ring */}
                   {isCapturing && index === currentPhotoIndex && (
-                    <div className="absolute inset-0 pointer-events-none border-2 border-blue-400/80 ring-2 ring-blue-200/60 rounded" />
+                    <div className="absolute inset-0 pointer-events-none border-2 border-black/80 ring-2 ring-gray-300/70 dark:ring-gray-600/70 rounded" />
                   )}
                 </div>
               ))}
@@ -259,7 +259,7 @@ export default function BoothScreen({
             type="button"
             id="upload-btn"
             onClick={() => fileInputRef.current?.click()}
-            className="h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-[11px] sm:text-xs font-semibold shadow hover:bg-blue-100 dark:hover:bg-blue-900/60 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors"
+            className="h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-[11px] sm:text-xs font-semibold shadow hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors"
             aria-label="Upload photos from your device"
             title="Upload photos instead"
           >
@@ -276,7 +276,7 @@ export default function BoothScreen({
               id="capture-btn"
               onClick={onRecordClick}
               disabled={recordDisabled}
-              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full text-white flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-2xl active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all ${isCapturing ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'
+              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full text-white flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-2xl active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all ${isCapturing ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' : 'bg-black hover:bg-gray-800 dark:bg-gray-100 dark:hover:bg-gray-200 dark:text-black'
                 }`}
               aria-label={
                 isCapturing
@@ -308,8 +308,8 @@ export default function BoothScreen({
             onClick={() => onBWToggle(!isBW)}
             aria-pressed={isBW}
             className={`h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border text-[11px] sm:text-xs font-semibold shadow active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-colors ${isBW
-                ? 'bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700'
-                : 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60'
+                ? 'bg-black dark:bg-gray-100 text-white dark:text-black border-black dark:border-gray-100'
+                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             aria-label={`Switch to ${isBW ? 'color' : 'black & white'} mode`}
             title={isBW ? 'Switch to color' : 'Switch to B&W'}
@@ -327,9 +327,9 @@ export default function BoothScreen({
             <div
               key={index}
               className={`h-1.5 rounded-full transition-all ${index < completedPhotos
-                  ? 'w-6 bg-blue-600 dark:bg-blue-500'
-                  : index === currentPhotoIndex && isCapturing
-                    ? 'w-5 bg-blue-400 dark:bg-blue-400'
+                  ? 'w-6 bg-black dark:bg-gray-200'
+                : index === currentPhotoIndex && isCapturing
+                    ? 'w-5 bg-gray-500 dark:bg-gray-400'
                     : 'w-3 bg-gray-300 dark:bg-gray-600'
                 }`}
               aria-hidden="true"

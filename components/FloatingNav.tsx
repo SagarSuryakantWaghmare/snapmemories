@@ -18,7 +18,7 @@ export default function FloatingNav({ onBack, showBack = false }: FloatingNavPro
         <button
           type="button"
           onClick={onBack}
-          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 backdrop-blur-md shadow-lg hover:bg-blue-100 dark:hover:bg-blue-900/60 active:scale-95 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-blue-400"
+          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 backdrop-blur-md shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-gray-500"
           aria-label="Go back to home screen"
           title="Back to home"
         >
@@ -32,7 +32,7 @@ export default function FloatingNav({ onBack, showBack = false }: FloatingNavPro
       <button
         type="button"
         onClick={toggleTheme}
-        className="pointer-events-auto ml-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 backdrop-blur-md shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-blue-400"
+        className="pointer-events-auto ml-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300 backdrop-blur-md shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-gray-500"
         aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       >

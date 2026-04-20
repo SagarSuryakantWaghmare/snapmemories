@@ -20,7 +20,7 @@ export default function ResultScreen({
   onImageClick,
 }: ResultScreenProps) {
   const hasAnyPhoto = photos.some((photo) => photo !== null);
-  const framePreviewBorderWidth = Math.min(selectedFrame.borderWidth, 6);
+  const framePreviewBorderWidth = Math.max(1, selectedFrame.borderWidth);
 
   return (
     <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col overflow-hidden">
@@ -46,7 +46,7 @@ export default function ResultScreen({
         {!showPrinting && !showFinalKiosk && (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-gray-800 px-6 py-5 shadow-md dark:shadow-lg">
             <svg
-              className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-400"
+              className="w-10 h-10 animate-spin text-gray-700 dark:text-gray-300"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -83,8 +83,8 @@ export default function ResultScreen({
                   onClick={() => onFilterChange(filter.value)}
                   aria-pressed={currentFilter === filter.value}
                   className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-medium transition-all text-xs sm:text-sm min-h-10 ${currentFilter === filter.value
-                      ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
-                      : 'bg-white/85 dark:bg-gray-700/85 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                      ? 'bg-black dark:bg-white text-white dark:text-black shadow-md'
+                      : 'bg-white/90 dark:bg-gray-700/90 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                     }`}
                   title={`Apply ${filter.name} filter`}
                 >
@@ -112,18 +112,18 @@ export default function ResultScreen({
                     selectedFrame.shape === 'heart'
                       ? {
                         clipPath: HEART_CLIP_POLYGON,
-                        border: `${Math.max(2, Math.min(selectedFrame.borderWidth, 4))}px solid ${selectedFrame.borderColor}`,
+                        border: `${framePreviewBorderWidth}px solid ${selectedFrame.borderColor}`,
                       }
                       : selectedFrame.shape === 'circle'
                         ? {
                           borderRadius: '50%',
-                          border: `${Math.max(2, Math.min(selectedFrame.borderWidth, 4))}px solid ${selectedFrame.borderColor}`,
+                          border: `${framePreviewBorderWidth}px solid ${selectedFrame.borderColor}`,
                         }
                         : {
                           borderRadius: '2px',
                           border:
                             selectedFrame.shape === 'rectangle'
-                              ? `${Math.max(2, Math.min(selectedFrame.borderWidth, 4))}px solid ${selectedFrame.borderColor}`
+                              ? `${framePreviewBorderWidth}px solid ${selectedFrame.borderColor}`
                               : '1px solid #E5E7EB',
                         };
 
@@ -198,7 +198,7 @@ export default function ResultScreen({
             type="button"
             id="retake-btn"
             onClick={onRetake}
-            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/60 active:scale-[0.98] shadow transition-colors min-h-11"
+            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] shadow transition-colors min-h-11"
             aria-label="Retake photos with new captures"
             title="Go back and capture new photos"
           >
@@ -209,7 +209,7 @@ export default function ResultScreen({
             id="download-btn"
             onClick={onDownload}
             disabled={!hasAnyPhoto || isDownloading}
-            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-blue-600 dark:bg-blue-700 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 active:scale-[0.98] shadow transition-colors min-h-11 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 sm:py-3.5 text-sm font-bold bg-black dark:bg-white text-white dark:text-black rounded-full hover:bg-gray-800 dark:hover:bg-gray-200 active:scale-[0.98] shadow transition-colors min-h-11 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={
               isDownloading
                 ? 'Downloading…'

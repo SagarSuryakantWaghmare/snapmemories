@@ -5,8 +5,8 @@ import { HomeScreenProps } from '@/lib/types';
 
 export default function HomeScreen({ onEnter }: HomeScreenProps) {
   return (
-    <main className="w-full h-full min-h-screen bg-gradient-to-br from-white via-white to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col items-center justify-center overflow-hidden p-4 relative">
-      <section className="w-full max-w-md rounded-3xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-gray-800/90 backdrop-blur p-5 sm:p-6 text-center shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
+    <main className="w-full h-full min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 flex flex-col items-center justify-center overflow-hidden p-4 relative">
+      <section className="w-full max-w-md rounded-3xl border border-black/15 dark:border-white/15 bg-white/95 dark:bg-gray-800/95 backdrop-blur p-5 sm:p-6 text-center shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
         <p className="text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase text-gray-500 dark:text-gray-400 mb-2">
           snapmemories
         </p>
@@ -44,7 +44,7 @@ export default function HomeScreen({ onEnter }: HomeScreenProps) {
         <button
           type="button"
           onClick={onEnter}
-          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-blue-600 dark:bg-blue-700 text-white text-sm sm:text-base font-bold rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2 transition-colors min-h-12"
+          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-pink-600 dark:bg-pink-600 text-white text-sm sm:text-base font-bold rounded-full hover:bg-pink-700 dark:hover:bg-pink-500 active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2 transition-colors min-h-12"
           aria-label="Start the photo booth application"
           title="Start capturing photos"
         >

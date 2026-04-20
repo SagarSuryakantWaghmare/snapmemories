@@ -51,7 +51,7 @@ export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-2 top-2 h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-colors focus-visible:ring-2 focus-visible:ring-blue-400"
+          className="absolute right-2 top-2 h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 active:scale-95 transition-colors focus-visible:ring-2 focus-visible:ring-gray-500"
           aria-label="Close photo preview"
           title="Close preview"
         >
@@ -72,7 +72,7 @@ export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
         <button
           type="button"
           onClick={onClose}
-          className="mt-3 md:mt-4 w-full px-4 md:px-6 py-3 sm:py-3.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 text-sm md:text-base transition-colors focus-visible:ring-2 focus-visible:ring-blue-400 min-h-11"
+          className="mt-3 md:mt-4 w-full px-4 md:px-6 py-3 sm:py-3.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 text-sm md:text-base transition-colors focus-visible:ring-2 focus-visible:ring-gray-500 min-h-11"
           aria-label="Close photo preview"
           title="Close and return"
         >

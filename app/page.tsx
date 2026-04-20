@@ -17,6 +17,8 @@ import { batchFilterImages } from '@/lib/filters';
 import { PHOTO_COUNT, COUNTDOWN_SECONDS, FLASH_DURATION_MS, CAPTURE_DELAY_MS, PRINTING_ANIMATION_MS, FRAMES } from '@/lib/constants';
 
 export default function Home() {
+  const defaultFrameIndex = Math.max(0, FRAMES.findIndex((frame) => frame.id === 'circle-black'));
+
   // Screen navigation
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
 
@@ -39,7 +41,7 @@ export default function Home() {
   const [cameraError, setCameraError] = useState<string | null>(null);
 
   // Frame selection
-  const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
+  const [currentFrameIndex, setCurrentFrameIndex] = useState(defaultFrameIndex);
 
   // Result screen state
   const [showPrinting, setShowPrinting] = useState(false);
@@ -199,11 +201,11 @@ export default function Home() {
     setCurrentFilter('none');
     setShowPrinting(false);
     setShowFinalKiosk(false);
-    setCurrentFrameIndex(0);
+    setCurrentFrameIndex(defaultFrameIndex);
     setCurrentPhotoIndex(0);
     setCameraError(null);
     setIsDownloading(false);
-  }, []);
+  }, [defaultFrameIndex]);
 
   // Navigation
   const goHome = useCallback(() => {
