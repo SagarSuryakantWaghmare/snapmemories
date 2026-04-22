@@ -21,12 +21,12 @@ export const FILTERS: { name: string; value: FilterName }[] = [
 export const FRAMES: Frame[] = [
   { 
     id: 'heart-pink', 
-    name: 'Heart Pink', 
+    name: 'Heart Classic', 
     price: 0,
     shape: 'heart',
-    borderColor: '#FF69B4',
+    borderColor: '#111111',
     borderWidth: 4,
-    backgroundColor: '#FFF0F5'
+    backgroundColor: '#FFFFFF'
   },
   { 
     id: 'circle-black', 
@@ -48,12 +48,12 @@ export const FRAMES: Frame[] = [
   },
   { 
     id: 'polaroid-orange', 
-    name: 'Polaroid Orange', 
+    name: 'Polaroid Mono', 
     price: 0,
     shape: 'polaroid',
-    borderColor: '#FF8C00',
+    borderColor: '#6B7280',
     borderWidth: 16,
-    backgroundColor: '#FFF8F0'
+    backgroundColor: '#FFFFFF'
   },
   { 
     id: 'bold-black', 
@@ -66,12 +66,12 @@ export const FRAMES: Frame[] = [
   },
   { 
     id: 'dark-elegant', 
-    name: 'Dark Elegant', 
+    name: 'Elegant Gray', 
     price: 0,
     shape: 'rectangle',
-    borderColor: '#2D2D2D',
+    borderColor: '#374151',
     borderWidth: 8,
-    backgroundColor: '#1A1A1A'
+    backgroundColor: '#F3F4F6'
   },
 ];
 
