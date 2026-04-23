@@ -1,9 +1,6 @@
 'use client';
 
-interface FloatingNavProps {
-  onBack?: () => void;
-  showBack?: boolean;
-}
+import { FloatingNavProps } from '@/lib/types';
 
 export default function FloatingNav({ onBack, showBack = false }: FloatingNavProps) {
   return (
@@ -13,7 +10,7 @@ export default function FloatingNav({ onBack, showBack = false }: FloatingNavPro
         <button
           type="button"
           onClick={onBack}
-          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 bg-white/90 text-gray-800 backdrop-blur-md shadow-lg hover:shadow-button-hover hover:bg-gray-100 active:scale-95 flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500 group"
+          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 backdrop-blur-md shadow-lg hover:shadow-button-hover hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400 group"
           aria-label="Go back to home screen"
           title="Back to home"
         >

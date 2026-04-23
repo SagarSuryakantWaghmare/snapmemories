@@ -80,3 +80,36 @@ export interface ModalProps {
   imageSrc: string | null;
   onClose: () => void;
 }
+
+export interface FloatingNavProps {
+  onBack?: () => void;
+  showBack?: boolean;
+}
+
+export interface TemplateSelectionProps {
+  templates: PhotoStripTemplate[];
+  selectedTemplate: PhotoStripTemplate;
+  onSelectTemplate: (template: PhotoStripTemplate) => void;
+  onContinue: () => void;
+  onHome?: () => void;
+}
+
+export interface PhotoStripTemplate {
+  id: string;
+  name: string;
+  description: string;
+  colors: {
+    background: string;
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+  borderStyle: {
+    width: number;
+    color: string;
+    pattern: 'solid' | 'dashed';
+  };
+  decorations: {
+    type: 'none' | 'confetti' | 'hearts' | 'neon' | 'film';
+  };
+}

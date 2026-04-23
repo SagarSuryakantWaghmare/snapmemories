@@ -465,7 +465,7 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="w-full min-h-screen overflow-hidden bg-white">
+      <div className="w-full min-h-screen overflow-hidden bg-white dark:bg-gray-950">
         <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
 
         {currentScreen === 'home' && <HomeScreen onEnter={goToTemplateSelection} />}

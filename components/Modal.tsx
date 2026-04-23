@@ -37,7 +37,7 @@ export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] bg-black/75 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[60] bg-black/75 dark:bg-black/90 flex items-center justify-center p-4"
       onClick={onClose}
       role="presentation"
     >
@@ -45,13 +45,13 @@ export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Photo preview"
-        className="relative bg-white border-2 border-black rounded-xl p-3 md:p-4 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto focus-visible:ring-2 focus-visible:ring-white"
+        className="relative bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-xl p-3 md:p-4 shadow-2xl dark:shadow-[0_25px_50px_rgba(0,0,0,0.8)] max-w-lg w-full max-h-[90vh] overflow-auto focus-visible:ring-2 focus-visible:ring-white dark:focus-visible:ring-gray-300"
         onClick={(event) => event.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-2 top-2 h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 active:scale-95 transition-colors focus-visible:ring-2 focus-visible:ring-gray-500"
+          className="absolute right-2 top-2 h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-200 active:scale-95 transition-colors focus-visible:ring-2 focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400"
           aria-label="Close photo preview"
           title="Close preview"
         >
@@ -72,7 +72,7 @@ export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
         <button
           type="button"
           onClick={onClose}
-          className="mt-3 md:mt-4 w-full px-4 md:px-6 py-3 sm:py-3.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 text-sm md:text-base transition-colors focus-visible:ring-2 focus-visible:ring-gray-500 min-h-11"
+          className="mt-3 md:mt-4 w-full px-4 md:px-6 py-3 sm:py-3.5 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 text-sm md:text-base transition-colors focus-visible:ring-2 focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400 min-h-11"
           aria-label="Close photo preview"
           title="Close and return"
         >

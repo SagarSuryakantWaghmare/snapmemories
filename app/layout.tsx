@@ -25,12 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#ffffff" />
-        <meta name="color-scheme" content="light" />
+        <meta name="color-scheme" content="light dark" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased dark:bg-gray-950">
         {children}
       </body>
     </html>
