@@ -149,16 +149,16 @@ export default function BoothScreen({
                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded flex flex-col items-center justify-center gap-2">
                 {cameraError ? (
                   <>
-                     <AlertTriangle className="w-8 h-8 text-gray-600 animate-bounce-soft" />
-                     <p className="text-xs text-center text-gray-700 px-2">Camera unavailable</p>
+                     <AlertTriangle className="w-8 h-8 text-gray-600 dark:text-gray-400 animate-bounce-soft" />
+                     <p className="text-xs text-center text-gray-700 dark:text-gray-300 px-2">Camera unavailable</p>
                   </>
                 ) : (
                   <>
-                     <svg className="w-6 h-6 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                     <svg className="w-6 h-6 animate-spin text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.25" />
                       <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                     <p className="text-xs text-gray-500">Starting camera…</p>
+                     <p className="text-xs text-gray-500 dark:text-gray-400">Starting camera…</p>
                   </>
                 )}
               </div>
@@ -212,7 +212,7 @@ export default function BoothScreen({
 
                   {/* Empty slot placeholder */}
                   {!photos[index] && (index > 0 || isCapturing) && (
-                     <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-lg sm:text-xl">
+                     <div className="absolute inset-0 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-lg sm:text-xl">
                       <span className="group-hover:scale-110 transition-transform duration-200">{index + 1}</span>
                     </div>
                   )}
@@ -327,10 +327,10 @@ export default function BoothScreen({
             <div
               key={index}
               className={`rounded-full transition-all duration-300 ${index < completedPhotos
-                    ? 'h-2 w-7 bg-black'
+                    ? 'h-2 w-7 bg-black dark:bg-white'
                 : index === currentPhotoIndex && isCapturing
-                    ? 'h-2 w-6 bg-gray-500 animate-pulse-glow'
-                    : 'h-2 w-4 bg-gray-300'
+                    ? 'h-2 w-6 bg-gray-500 dark:bg-gray-400 animate-pulse-glow'
+                    : 'h-2 w-4 bg-gray-300 dark:bg-gray-600'
                 }`}
               aria-hidden="true"
             />
@@ -339,7 +339,7 @@ export default function BoothScreen({
 
         {/* Status message */}
         <p
-          className={`mt-2.5 text-center text-[11px] font-medium transition-colors duration-200 ${cameraError ? 'text-gray-700' : 'text-gray-500'}`}
+          className={`mt-2.5 text-center text-[11px] font-medium transition-colors duration-200 ${cameraError ? 'text-gray-700 dark:text-gray-300' : 'text-gray-500 dark:text-gray-400'}`}
           aria-live="polite"
           role="status"
         >

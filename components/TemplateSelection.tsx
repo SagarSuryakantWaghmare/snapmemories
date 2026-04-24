@@ -57,7 +57,7 @@ export default function TemplateSelection({
                             borderStyle: template.borderStyle.pattern === 'solid' ? 'solid' : 'dashed',
                           }}
                         >
-                           <span className="text-[8px] text-gray-400 font-medium">{index}</span>
+                           <span className="text-[8px] text-gray-400 dark:text-gray-500 font-medium">{index}</span>
                         </div>
                       ))}
                     </div>
@@ -122,7 +122,7 @@ export default function TemplateSelection({
                   </div>
 
                   {isSelected && (
-                     <div className="absolute top-3 right-3 rounded-full bg-black text-white text-[10px] px-2.5 py-1 shadow-lg font-semibold animate-scale-in flex items-center gap-1">
+                     <div className="absolute top-3 right-3 rounded-full bg-black dark:bg-white text-white dark:text-black text-[10px] px-2.5 py-1 shadow-lg font-semibold animate-scale-in flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Selected
                     </div>
