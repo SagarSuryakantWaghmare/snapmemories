@@ -1,7 +1,7 @@
 'use client';
 
 import { Check, ArrowRight } from 'lucide-react';
-import { PhotoStripTemplate, TemplateSelectionProps } from '@/lib/types';
+import { TemplateSelectionProps } from '@/lib/types';
 import FloatingNav from './FloatingNav';
 
 export default function TemplateSelection({

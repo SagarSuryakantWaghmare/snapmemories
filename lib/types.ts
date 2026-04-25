@@ -86,30 +86,12 @@ export interface FloatingNavProps {
   showBack?: boolean;
 }
 
+import type { PhotoStripTemplate } from '@/lib/templates';
+
 export interface TemplateSelectionProps {
   templates: PhotoStripTemplate[];
   selectedTemplate: PhotoStripTemplate;
   onSelectTemplate: (template: PhotoStripTemplate) => void;
   onContinue: () => void;
   onHome?: () => void;
-}
-
-export interface PhotoStripTemplate {
-  id: string;
-  name: string;
-  description: string;
-  colors: {
-    background: string;
-    primary: string;
-    secondary: string;
-    accent: string;
-  };
-  borderStyle: {
-    width: number;
-    color: string;
-    pattern: 'solid' | 'dashed';
-  };
-  decorations: {
-    type: 'none' | 'confetti' | 'hearts' | 'neon' | 'film';
-  };
 }

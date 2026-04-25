@@ -46,8 +46,8 @@ export const PHOTO_STRIP_TEMPLATES: PhotoStripTemplate[] = [
       pattern: 'solid',
     },
     decorations: {
-      type: 'none',
-      intensity: 0,
+      type: 'confetti',
+      intensity: 0.3,
     },
     textArea: {
       enabled: true,
@@ -74,8 +74,8 @@ export const PHOTO_STRIP_TEMPLATES: PhotoStripTemplate[] = [
       pattern: 'solid',
     },
     decorations: {
-      type: 'none',
-      intensity: 0,
+      type: 'hearts',
+      intensity: 0.5,
     },
     textArea: {
       enabled: true,
@@ -102,8 +102,8 @@ export const PHOTO_STRIP_TEMPLATES: PhotoStripTemplate[] = [
       pattern: 'solid',
     },
     decorations: {
-      type: 'none',
-      intensity: 0,
+      type: 'hearts',
+      intensity: 0.6,
     },
     textArea: {
       enabled: true,
@@ -155,11 +155,11 @@ export const PHOTO_STRIP_TEMPLATES: PhotoStripTemplate[] = [
     borderStyle: {
       width: 3,
       color: '#111111',
-      pattern: 'solid',
+      pattern: 'glow',
     },
     decorations: {
-      type: 'none',
-      intensity: 0,
+      type: 'neon',
+      intensity: 0.7,
     },
     textArea: {
       enabled: true,
