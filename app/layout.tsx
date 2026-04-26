@@ -30,7 +30,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
         <meta name="color-scheme" content="light dark" />
       </head>
-      <body className="antialiased dark:bg-gray-950">
+      <body className="antialiased bg-white">
         {children}
       </body>
     </html>

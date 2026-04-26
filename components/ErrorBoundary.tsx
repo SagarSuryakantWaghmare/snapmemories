@@ -34,25 +34,25 @@ export default class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError && this.state.error) {
       return (
         this.props.fallback?.(this.state.error, this.reset) ?? (
-          <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
-            <div className="max-w-md bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-[0_25px_50px_rgba(0,0,0,0.5)] border border-gray-300 dark:border-gray-700">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 mx-auto mb-4">
-                <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+            <div className="max-w-md bg-white rounded-2xl p-6 shadow-lg border border-gray-300">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mx-auto mb-4">
+                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">Something went wrong</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-4">
+              <h2 className="text-xl font-bold text-center text-gray-900 mb-2">Something went wrong</h2>
+              <p className="text-sm text-gray-600 text-center mb-4">
                 We encountered an unexpected error. Please try refreshing the page.
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3 mb-4 font-mono break-words max-h-24 overflow-auto">
+              <p className="text-xs text-gray-500 bg-gray-50 rounded p-3 mb-4 font-mono break-words max-h-24 overflow-auto">
                 {this.state.error.message}
               </p>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={this.reset}
-                  className="flex-1 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 active:scale-95 font-medium text-sm transition-colors"
+                  className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 active:scale-95 font-medium text-sm transition-colors"
                   aria-label="Try again"
                 >
                   Try Again
@@ -60,7 +60,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                 <button
                   type="button"
                   onClick={() => (window.location.href = '/')}
-                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 active:scale-95 font-medium text-sm transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 active:scale-95 font-medium text-sm transition-colors"
                   aria-label="Go home"
                 >
                   Home

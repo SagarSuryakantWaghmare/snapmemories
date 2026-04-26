@@ -66,8 +66,8 @@ export default function FrameSelection({
       size === 'large' ? 'w-20 h-20 sm:w-24 sm:h-24' : 'w-14 h-14 sm:w-16 sm:h-16';
 
     const baseClasses = `relative transition-all duration-300 ${isSelected
-        ? 'ring-2 ring-black dark:ring-white scale-110 shadow-xl dark:shadow-[0_10px_25px_rgba(0,0,0,0.3)] z-10'
-        : 'opacity-60 hover:opacity-80 hover:scale-105 shadow-md dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)]'
+        ? 'ring-2 ring-black scale-110 shadow-xl z-10'
+        : 'opacity-60 hover:opacity-80 hover:scale-105 shadow-md'
       }`;
 
     const photoPreview = photos.find((p) => p !== null) ?? null;
@@ -127,7 +127,7 @@ export default function FrameSelection({
             <Image src={photoPreview} alt="Frame preview" fill className="object-cover" />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -179,7 +179,7 @@ export default function FrameSelection({
           <Image src={photoPreview} alt="Frame preview" fill className="object-cover" />
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
             </svg>
           </div>
@@ -189,16 +189,16 @@ export default function FrameSelection({
   };
 
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-950 dark:to-black flex flex-col overflow-hidden">
+    <div className="w-full h-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col overflow-hidden">
       <FloatingNav showBack onBack={onHome} />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="pt-14 sm:pt-16 pb-2 text-center shrink-0 px-4">
-            <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400 font-semibold">
+            <p className="text-[11px] sm:text-xs uppercase tracking-[0.12em] text-gray-500 font-semibold">
             Step 2 of 3
           </p>
-          <h1 className="text-xl sm:text-2xl font-bold text-black dark:text-white mt-1">Choose your frame</h1>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-black mt-1">Choose your frame</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Swipe, tap, or use keyboard ← → to select a style.
           </p>
         </header>
@@ -210,7 +210,7 @@ export default function FrameSelection({
               type="button"
               id="frame-prev-btn"
               onClick={goToPrevFrame}
-              className="absolute left-0 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg dark:shadow-[0_10px_25px_rgba(0,0,0,0.3)] flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 active:scale-95 transition-all text-gray-800 dark:text-gray-200"
+              className="absolute left-0 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white active:scale-95 transition-all text-gray-800"
               aria-label="Previous frame style"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,7 +244,7 @@ export default function FrameSelection({
                     currentFrameIndex === index ? 'large' : 'small'
                   )}
                   <span
-                    className={`text-[10px] sm:text-xs font-medium transition-all ${currentFrameIndex === index ? 'text-black dark:text-white scale-105' : 'text-gray-400 dark:text-gray-500'
+                    className={`text-[10px] sm:text-xs font-medium transition-all ${currentFrameIndex === index ? 'text-black scale-105' : 'text-gray-400'
                        }`}
                   >
                     {frame.name}
@@ -257,7 +257,7 @@ export default function FrameSelection({
               type="button"
               id="frame-next-btn"
               onClick={goToNextFrame}
-              className="absolute right-0 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg dark:shadow-[0_10px_25px_rgba(0,0,0,0.3)] flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 active:scale-95 transition-all text-gray-800 dark:text-gray-200"
+              className="absolute right-0 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white active:scale-95 transition-all text-gray-800"
               aria-label="Next frame style"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,8 +277,8 @@ export default function FrameSelection({
                 aria-label={`Go to frame ${frame.name}`}
                 aria-pressed={currentFrameIndex === index}
                 className={`h-2 rounded-full transition-all ${currentFrameIndex === index
-                    ? 'bg-black dark:bg-white w-4'
-                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 w-2'
+                    ? 'bg-black w-4'
+                    : 'bg-gray-300 hover:bg-gray-400 w-2'
                   }`}
               />
             ))}
@@ -286,11 +286,11 @@ export default function FrameSelection({
 
           {/* Strip mini-preview */}
           <div className="flex flex-col items-center gap-2">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Preview: <span className="font-medium text-gray-700 dark:text-gray-300">{selectedFrame.name}</span>
+              <p className="text-xs text-gray-500">
+                Preview: <span className="font-medium text-gray-700">{selectedFrame.name}</span>
             </p>
             <div
-              className="p-2 rounded-lg shadow-lg dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-all duration-300"
+              className="p-2 rounded-lg shadow-lg transition-all duration-300"
               style={{
                 background: selectedFrame.backgroundColor,
                 border:
@@ -336,13 +336,13 @@ export default function FrameSelection({
                         }
                       >
                         <div
-                          className="relative bg-gray-100 dark:bg-gray-700 overflow-hidden"
+                          className="relative bg-gray-100 overflow-hidden"
                           style={{ aspectRatio: '1/1', ...shapeStyle }}
                         >
                           {photo ? (
                             <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
                               <span className="text-xs">{i + 1}</span>
                             </div>
                           )}
@@ -352,11 +352,11 @@ export default function FrameSelection({
                   );
                 })}
               </div>
-              <p className="text-[6px] text-center text-gray-400 dark:text-gray-500 mt-1 tracking-wider">
+              <p className="text-[6px] text-center text-gray-400 mt-1 tracking-wider">
                 snapmemories by sagar
               </p>
             </div>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 text-center">
+              <p className="text-[10px] text-gray-500 text-center">
               Downloaded strip will match this crop and shape.
             </p>
           </div>
@@ -364,20 +364,20 @@ export default function FrameSelection({
       </main>
 
       {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white dark:from-gray-900 via-white/95 dark:via-gray-900/95 to-transparent backdrop-blur-sm border-t border-black/5 dark:border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-2.5 pb-3 safe-bottom bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-sm border-t border-black/5">
         <button
           type="button"
           id="frame-continue-btn"
           onClick={onSelectFrame}
           disabled={!hasAnyPhoto}
-          className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-black dark:bg-white text-white dark:text-black text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 dark:hover:bg-gray-200 active:scale-[0.98] shadow-xl dark:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-full max-w-md mx-auto block px-8 sm:px-10 py-3 sm:py-3.5 bg-black text-white text-sm sm:text-base font-bold rounded-full hover:bg-gray-800 active:scale-[0.98] shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           aria-label={hasAnyPhoto ? `Continue with ${selectedFrame.name} frame` : 'No photos available'}
           title={hasAnyPhoto ? 'Continue to filters' : 'No photos to continue with'}
         >
           Continue to filters →
         </button>
         {!hasAnyPhoto && (
-            <p className="text-center text-xs text-gray-600 dark:text-gray-400 mt-1.5">
+            <p className="text-center text-xs text-gray-600 mt-1.5">
             No photos found. Please go back and capture or upload photos.
           </p>
         )}

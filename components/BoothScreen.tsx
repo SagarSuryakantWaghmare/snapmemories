@@ -72,14 +72,14 @@ export default function BoothScreen({
   const videoFilter = isBW ? 'grayscale(1) contrast(1.1)' : 'none';
 
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-950 dark:to-black flex flex-col overflow-hidden relative">
+    <div className="w-full h-full min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 flex flex-col overflow-hidden relative">
       {/* Top bar */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between p-3 sm:p-4 safe-top pointer-events-none">
         <button
           type="button"
           id="booth-home-btn"
           onClick={onHome}
-          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 backdrop-blur-md shadow-lg hover:shadow-button-hover hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 flex items-center justify-center transition-all duration-200 group"
+          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 bg-white/90 text-gray-800 backdrop-blur-md shadow-lg hover:shadow-button-hover hover:bg-gray-100 active:scale-95 flex items-center justify-center transition-all duration-200 group"
           aria-label="Go back to home screen"
           title="Go home"
         >
@@ -90,10 +90,10 @@ export default function BoothScreen({
 
         <div
           className={`pointer-events-auto rounded-full border px-3 py-1.5 text-[11px] sm:text-xs font-medium backdrop-blur transition-all duration-300 inline-flex items-center gap-1.5 shadow-md animate-fade-in ${cameraError
-              ? 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700'
+              ? 'bg-gray-100 text-gray-800 border-gray-300'
               : isCameraReady
-                ? 'bg-white/95 dark:bg-gray-800/95 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700'
-                : 'bg-white/95 dark:bg-gray-800/95 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
+                ? 'bg-white/95 text-gray-800 border-gray-300'
+                : 'bg-white/95 text-gray-700 border-gray-200'
             }`}
           aria-live="polite"
           role="status"
@@ -130,9 +130,9 @@ export default function BoothScreen({
 
         {/* Desktop live preview */}
         <div className="shrink-0 hidden md:block animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center mb-2 uppercase tracking-wide">Live preview</p>
+          <p className="text-xs font-semibold text-gray-700 text-center mb-2 uppercase tracking-wide">Live preview</p>
           <div
-            className="bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-xl p-2 shadow-lg hover:shadow-button-hover transition-shadow duration-300 overflow-hidden group"
+            className="bg-white border-2 border-black rounded-xl p-2 shadow-lg hover:shadow-button-hover transition-shadow duration-300 overflow-hidden group"
             style={{ width: 'min(300px, 38vw)', aspectRatio: '1/1' }}
           >
             {isCameraReady ? (
@@ -146,19 +146,19 @@ export default function BoothScreen({
                 aria-label="Live camera preview"
               />
             ) : (
-               <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded flex flex-col items-center justify-center gap-2">
+               <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded flex flex-col items-center justify-center gap-2">
                 {cameraError ? (
                   <>
-                     <AlertTriangle className="w-8 h-8 text-gray-600 dark:text-gray-400 animate-bounce-soft" />
-                     <p className="text-xs text-center text-gray-700 dark:text-gray-300 px-2">Camera unavailable</p>
+                     <AlertTriangle className="w-8 h-8 text-gray-600 animate-bounce-soft" />
+                     <p className="text-xs text-center text-gray-700 px-2">Camera unavailable</p>
                   </>
                 ) : (
                   <>
-                     <svg className="w-6 h-6 animate-spin text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                     <svg className="w-6 h-6 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.25" />
                       <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                     <p className="text-xs text-gray-500 dark:text-gray-400">Starting camera…</p>
+                     <p className="text-xs text-gray-500">Starting camera…</p>
                   </>
                 )}
               </div>
@@ -169,14 +169,14 @@ export default function BoothScreen({
         {/* Strip preview column */}
         <div className="shrink-0 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <div className="mb-3 flex items-center justify-between px-1">
-            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Strip preview</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-full">
+            <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Strip preview</p>
+            <p className="text-[11px] text-gray-500 font-medium bg-gray-100 px-2.5 py-1 rounded-full">
               {completedPhotos}/{PHOTO_COUNT} captured
             </p>
           </div>
 
           <div
-             className="bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-xl p-1.5 shadow-lg hover:shadow-button-hover transition-shadow duration-300"
+             className="bg-white border-2 border-black rounded-xl p-1.5 shadow-lg hover:shadow-button-hover transition-shadow duration-300"
             style={{ width: 'min(140px, 40vw)' }}
           >
             <div className="flex flex-col gap-0.5">
@@ -212,7 +212,7 @@ export default function BoothScreen({
 
                   {/* Empty slot placeholder */}
                   {!photos[index] && (index > 0 || isCapturing) && (
-                     <div className="absolute inset-0 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-lg sm:text-xl">
+                     <div className="absolute inset-0 flex items-center justify-center text-gray-500 font-bold text-lg sm:text-xl">
                       <span className="group-hover:scale-110 transition-transform duration-200">{index + 1}</span>
                     </div>
                   )}
@@ -238,12 +238,12 @@ export default function BoothScreen({
                 </div>
               ))}
             </div>
-            <p className="text-[7px] sm:text-[8px] text-center text-gray-400 dark:text-gray-500 mt-1 tracking-wider">
+            <p className="text-[7px] sm:text-[8px] text-center text-gray-400 mt-1 tracking-wider">
               snapmemories by sagar
             </p>
           </div>
 
-          <p className="mt-2.5 text-center text-[11px] text-gray-500 dark:text-gray-400 max-w-[140px] sm:max-w-[160px] leading-tight">
+          <p className="mt-2.5 text-center text-[11px] text-gray-500 max-w-[140px] sm:max-w-[160px] leading-tight">
             {cameraError
               ? 'Camera unavailable — use Upload instead.'
               : 'Photos fill automatically as each shot is taken.'}
@@ -252,14 +252,14 @@ export default function BoothScreen({
       </main>
 
       {/* Bottom controls */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 dark:border-white/10 bg-gradient-to-t from-white via-white/95 to-white/70 dark:from-gray-800 dark:via-gray-800/95 dark:to-gray-800/70 px-4 pt-2.5 pb-3 safe-bottom backdrop-blur shadow-xl">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/10 bg-gradient-to-t from-white via-white/95 to-white/70 px-4 pt-2.5 pb-3 safe-bottom backdrop-blur shadow-xl">
         <div className="mx-auto flex w-full max-w-md items-end justify-between gap-3">
           {/* Upload button */}
           <button
             type="button"
             id="upload-btn"
             onClick={() => fileInputRef.current?.click()}
-            className="h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-[11px] sm:text-xs font-semibold shadow hover:shadow-button-hover hover:bg-gray-100 dark:hover:bg-gray-600 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-all duration-200 group"
+            className="h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border border-gray-300 bg-white text-gray-800 text-[11px] sm:text-xs font-semibold shadow hover:shadow-button-hover hover:bg-gray-100 active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-all duration-200 group"
             aria-label="Upload photos from your device"
             title="Upload photos instead"
           >
@@ -296,7 +296,7 @@ export default function BoothScreen({
                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white group-hover:scale-110 transition-transform" aria-hidden="true" />
               )}
             </button>
-            <p className="text-xs sm:text-sm text-black dark:text-white font-bold bg-white/95 dark:bg-gray-700/95 px-3 py-1 rounded-full shadow-md whitespace-nowrap">
+            <p className="text-xs sm:text-sm text-black font-bold bg-white/95 px-3 py-1 rounded-full shadow-md whitespace-nowrap">
               {isCapturing ? `${activeCaptureStep}/${PHOTO_COUNT}` : 'Capture'}
             </p>
           </div>
@@ -308,8 +308,8 @@ export default function BoothScreen({
             onClick={() => onBWToggle(!isBW)}
             aria-pressed={isBW}
             className={`h-12 sm:h-14 min-w-14 sm:min-w-16 rounded-2xl border text-[11px] sm:text-xs font-semibold shadow active:scale-95 inline-flex flex-col items-center justify-center gap-0.5 transition-all duration-200 group ${isBW
-                ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white hover:shadow-button-hover'
-                : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 hover:shadow-button-hover'
+                ? 'bg-black text-white border-black hover:shadow-button-hover'
+                : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100 hover:shadow-button-hover'
               }`}
             aria-label={`Switch to ${isBW ? 'color' : 'black & white'} mode`}
             title={isBW ? 'Switch to color' : 'Switch to B&W'}
@@ -327,10 +327,10 @@ export default function BoothScreen({
             <div
               key={index}
               className={`rounded-full transition-all duration-300 ${index < completedPhotos
-                    ? 'h-2 w-7 bg-black dark:bg-white'
+                    ? 'h-2 w-7 bg-black'
                 : index === currentPhotoIndex && isCapturing
-                    ? 'h-2 w-6 bg-gray-500 dark:bg-gray-400 animate-pulse-glow'
-                    : 'h-2 w-4 bg-gray-300 dark:bg-gray-600'
+                    ? 'h-2 w-6 bg-gray-500 animate-pulse-glow'
+                    : 'h-2 w-4 bg-gray-300'
                 }`}
               aria-hidden="true"
             />
@@ -339,7 +339,7 @@ export default function BoothScreen({
 
         {/* Status message */}
         <p
-          className={`mt-2.5 text-center text-[11px] font-medium transition-colors duration-200 ${cameraError ? 'text-gray-700 dark:text-gray-300' : 'text-gray-500 dark:text-gray-400'}`}
+          className={`mt-2.5 text-center text-[11px] font-medium transition-colors duration-200 ${cameraError ? 'text-gray-700' : 'text-gray-500'}`}
           aria-live="polite"
           role="status"
         >
