@@ -34,33 +34,43 @@ export default class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError && this.state.error) {
       return (
         this.props.fallback?.(this.state.error, this.reset) ?? (
-          <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-            <div className="max-w-md bg-white rounded-2xl p-6 shadow-lg border border-gray-300">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mx-auto mb-4">
-                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div className="flex min-h-screen w-full items-center justify-center p-5">
+            <div className="w-full max-w-md rounded-3xl border border-line bg-card p-7 shadow-card">
+              <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-accent-soft">
+                <svg
+                  className="h-6 w-6 text-accent-deep"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold text-center text-gray-900 mb-2">Something went wrong</h2>
-              <p className="text-sm text-gray-600 text-center mb-4">
-                We encountered an unexpected error. Please try refreshing the page.
+              <h2 className="text-center font-display text-2xl text-ink">Something went wrong</h2>
+              <p className="mt-2 text-center text-sm text-ink-soft">
+                The booth hit an unexpected snag. Try again, or head back home.
               </p>
-              <p className="text-xs text-gray-500 bg-gray-50 rounded p-3 mb-4 font-mono break-words max-h-24 overflow-auto">
+              <p className="mt-4 max-h-24 overflow-auto break-words rounded-xl bg-paper-deep p-3 font-mono text-xs text-ink-soft">
                 {this.state.error.message}
               </p>
-              <div className="flex gap-3">
+              <div className="mt-5 flex gap-2.5">
                 <button
                   type="button"
                   onClick={this.reset}
-                  className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 active:scale-95 font-medium text-sm transition-colors"
+                  className="min-h-12 flex-1 rounded-full bg-accent px-4 text-sm font-semibold text-white shadow-accent transition-[background-color,box-shadow,transform] hover:bg-accent-deep active:scale-[0.98]"
                   aria-label="Try again"
                 >
-                  Try Again
+                  Try again
                 </button>
                 <button
                   type="button"
                   onClick={() => (window.location.href = '/')}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 active:scale-95 font-medium text-sm transition-colors"
+                  className="min-h-12 flex-1 rounded-full border border-line bg-card px-4 text-sm font-semibold text-ink transition-[background-color,box-shadow,transform] hover:bg-paper-soft active:scale-[0.98]"
                   aria-label="Go home"
                 >
                   Home

@@ -1,82 +1,128 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { X } from 'lucide-react';
 import { ModalProps } from '@/lib/types';
+import { gsap, useGSAP, EASE, DUR, reducedMotion } from '@/lib/motion';
 
 export default function Modal({ isOpen, imageSrc, onClose }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+  const [shownSrc, setShownSrc] = useState<string | null>(imageSrc);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Keep the last image while the close animation plays.
   useEffect(() => {
-    if (!isOpen) return;
+    if (imageSrc) setShownSrc(imageSrc);
+  }, [imageSrc]);
 
+  useEffect(() => {
+    if (isOpen) setMounted(true);
+  }, [isOpen]);
+
+  // Escape to close + lock body scroll while mounted.
+  useEffect(() => {
+    if (!mounted) return;
     const previousOverflow = document.body.style.overflow;
-    
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', handleKeyDown);
 
-    // Focus management
-    const modalContent = document.querySelector('[role="dialog"]');
-    if (modalContent instanceof HTMLElement) {
-      const closeButton = modalContent.querySelector('button[aria-label*="Close"]') as HTMLButtonElement;
-      closeButton?.focus();
-    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = previousOverflow;
     };
-  }, [isOpen, onClose]);
+  }, [mounted, onClose]);
 
-  if (!isOpen || !imageSrc) return null;
+  useGSAP(
+    () => {
+      if (!mounted) return;
+      const backdrop = backdropRef.current;
+      const dialog = dialogRef.current;
+      if (!backdrop || !dialog) return;
+
+      const focusClose = () =>
+        dialog.querySelector<HTMLButtonElement>('[data-modal-close]')?.focus();
+
+      if (isOpen) {
+        if (reducedMotion()) {
+          gsap.set([backdrop, dialog], { autoAlpha: 1, scale: 1, y: 0 });
+          focusClose();
+          return;
+        }
+        gsap
+          .timeline({ onComplete: focusClose })
+          .fromTo(backdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: DUR.fast })
+          .fromTo(
+            dialog,
+            { autoAlpha: 0, scale: 0.9, y: 14 },
+            { autoAlpha: 1, scale: 1, y: 0, duration: DUR.base, ease: EASE.pop },
+            '-=0.12',
+          );
+      } else {
+        if (reducedMotion()) {
+          setMounted(false);
+          return;
+        }
+        gsap
+          .timeline({ onComplete: () => setMounted(false) })
+          .to(dialog, { autoAlpha: 0, scale: 0.92, y: 12, duration: DUR.fast, ease: EASE.soft })
+          .to(backdrop, { autoAlpha: 0, duration: DUR.fast }, '-=0.1');
+      }
+    },
+    { dependencies: [isOpen, mounted] },
+  );
+
+  if (!mounted || !shownSrc) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[60] bg-black/75 flex items-center justify-center p-4"
+      ref={backdropRef}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/75 p-4 backdrop-blur-sm"
       onClick={onClose}
       role="presentation"
+      style={{ opacity: 0 }}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Photo preview"
-        className="relative bg-white border-2 border-black rounded-xl p-3 md:p-4 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto focus-visible:ring-2 focus-visible:ring-white"
+        className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-line bg-card p-3 shadow-lift sm:p-4"
         onClick={(event) => event.stopPropagation()}
+        style={{ opacity: 0 }}
       >
         <button
           type="button"
+          data-modal-close
           onClick={onClose}
-          className="absolute right-2 top-2 h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 active:scale-95 transition-colors focus-visible:ring-2 focus-visible:ring-gray-500"
+          className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-full bg-ink/80 text-white backdrop-blur-sm transition-colors hover:bg-ink active:scale-95"
           aria-label="Close photo preview"
           title="Close preview"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="h-5 w-5" />
         </button>
 
         <Image
-          src={imageSrc}
+          src={shownSrc}
           alt="Enlarged photo preview"
           width={800}
           height={600}
-          className="w-full h-auto rounded"
+          className="h-auto w-full rounded-2xl"
           priority
         />
 
         <button
           type="button"
           onClick={onClose}
-          className="mt-3 md:mt-4 w-full px-4 md:px-6 py-3 sm:py-3.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 text-sm md:text-base transition-colors focus-visible:ring-2 focus-visible:ring-gray-500 min-h-11"
+          className="mt-3 min-h-12 w-full rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-accent transition-[background-color,box-shadow,transform] hover:bg-accent-deep hover:shadow-lift active:scale-[0.98]"
           aria-label="Close photo preview"
-          title="Close and return"
         >
-          Close
+          Close preview
         </button>
       </div>
     </div>

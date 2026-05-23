@@ -8,13 +8,13 @@ import FrameSelection from '@/components/FrameSelection';
 import ResultScreen from '@/components/ResultScreen';
 import Modal from '@/components/Modal';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import { Screen, FilterName } from '@/lib/types';
 import { PhotoStripTemplate, PHOTO_STRIP_TEMPLATES, DEFAULT_TEMPLATE } from '@/lib/templates';
 import { startCamera, stopCamera, captureVideoFrame, applyVideoFilter, waitForVideoReady } from '@/lib/camera';
 import { downloadCompositeImage, delay } from '@/lib/canvas';
 import { batchFilterImages } from '@/lib/filters';
-import { PHOTO_COUNT, COUNTDOWN_SECONDS, FLASH_DURATION_MS, CAPTURE_DELAY_MS, PRINTING_ANIMATION_MS, FRAMES } from '@/lib/constants';
+import { PHOTO_COUNT, COUNTDOWN_SECONDS, CAPTURE_DELAY_MS, PRINTING_ANIMATION_MS, FRAMES } from '@/lib/constants';
+import { gsap, reducedMotion } from '@/lib/motion';
 
 export default function Home() {
   const defaultFrameIndex = Math.max(0, FRAMES.findIndex((frame) => frame.id === 'circle-black'));
@@ -227,41 +227,64 @@ export default function Home() {
     setIsBW(checked);
   }, []);
 
-  // Countdown overlay
-  const showCountdown = (photoIndex: number): Promise<void> => {
+  // Countdown overlay — GSAP-driven scale/fade on the booth overlay.
+  const showCountdown = (): Promise<void> => {
     return new Promise((resolve) => {
-      const countdownEl = document.getElementById(`countdown-${photoIndex}`);
-      if (!countdownEl) {
+      const overlay = document.getElementById('countdown-overlay');
+      const numberEl = overlay?.querySelector('span') ?? null;
+      if (!overlay || !numberEl) {
         resolve();
         return;
       }
 
-      let count = COUNTDOWN_SECONDS;
-      countdownEl.textContent = String(count);
-      countdownEl.style.opacity = '1';
+      if (reducedMotion()) {
+        let count = COUNTDOWN_SECONDS;
+        numberEl.textContent = String(count);
+        overlay.style.opacity = '1';
+        const interval = setInterval(() => {
+          count--;
+          if (count <= 0) {
+            clearInterval(interval);
+            overlay.style.opacity = '0';
+            resolve();
+          } else {
+            numberEl.textContent = String(count);
+          }
+        }, 700);
+        return;
+      }
 
-      const interval = setInterval(() => {
-        count--;
-        if (count <= 0) {
-          clearInterval(interval);
-          countdownEl.style.opacity = '0';
+      overlay.style.opacity = '1';
+      const tl = gsap.timeline({
+        onComplete: () => {
+          overlay.style.opacity = '0';
           resolve();
-        } else {
-          countdownEl.textContent = String(count);
-        }
-      }, 1000);
+        },
+      });
+
+      for (let n = COUNTDOWN_SECONDS; n >= 1; n--) {
+        tl.call(() => {
+          numberEl.textContent = String(n);
+        })
+          .fromTo(
+            numberEl,
+            { scale: 0.4, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(2)' },
+          )
+          .to(numberEl, { scale: 1.55, opacity: 0, duration: 0.36, ease: 'power2.in' }, '+=0.32');
+      }
     });
   };
 
-  // Flash effect
-  const triggerFlash = (photoIndex: number) => {
-    const flashEl = document.getElementById(`flash-${photoIndex}`);
-    if (flashEl) {
-      flashEl.style.opacity = '1';
-      setTimeout(() => {
-        if (flashEl) flashEl.style.opacity = '0';
-      }, FLASH_DURATION_MS);
+  // Flash effect — GSAP fade on the booth overlay.
+  const triggerFlash = () => {
+    const flash = document.getElementById('flash-overlay');
+    if (!flash) return;
+    if (reducedMotion()) {
+      flash.style.opacity = '0';
+      return;
     }
+    gsap.fromTo(flash, { opacity: 0.92 }, { opacity: 0, duration: 0.5, ease: 'power2.out' });
   };
 
   // Photo capture sequence
@@ -306,7 +329,7 @@ export default function Home() {
       setCurrentPhotoIndex(i);
 
       // Show countdown for this slot
-      await showCountdown(i);
+      await showCountdown();
       await delay(150);
 
       // Try to capture with retries
@@ -333,7 +356,7 @@ export default function Home() {
       photosRef.current = [...capturedPhotos];
 
       // Flash
-      triggerFlash(i);
+      triggerFlash();
 
       // Pause before next photo (skip after last)
       if (i < PHOTO_COUNT - 1) {
@@ -465,9 +488,10 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="w-full min-h-screen overflow-hidden bg-white">
+      <div className="relative w-full min-h-screen overflow-x-hidden">
         <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
 
+        <div key={currentScreen} className="screen-enter">
         {currentScreen === 'home' && <HomeScreen onEnter={goToTemplateSelection} />}
 
         {currentScreen === 'templateSelection' && (
@@ -522,6 +546,7 @@ export default function Home() {
             onImageClick={handleImageClick}
           />
         )}
+        </div>
 
         <Modal
           isOpen={modalOpen}

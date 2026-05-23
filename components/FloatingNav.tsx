@@ -1,23 +1,62 @@
 'use client';
 
+import { ArrowLeft, Check } from 'lucide-react';
 import { FloatingNavProps } from '@/lib/types';
 
-export default function FloatingNav({ onBack, showBack = false }: FloatingNavProps) {
+const STEP_LABELS = ['Style', 'Frame', 'Strip'];
+
+export default function FloatingNav({ onBack, showBack = false, step }: FloatingNavProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between p-3 sm:p-4 safe-top pointer-events-none animate-fade-in">
-      {/* Back button */}
+    <div className="safe-top pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center p-3 sm:p-4">
       {showBack && onBack && (
         <button
           type="button"
           onClick={onBack}
-          className="pointer-events-auto h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-gray-300 bg-white/90 text-gray-800 backdrop-blur-md shadow-lg hover:shadow-button-hover hover:bg-gray-100 active:scale-95 flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500 group"
-          aria-label="Go back to home screen"
-          title="Back to home"
+          className="group pointer-events-auto inline-flex h-11 items-center gap-1.5 rounded-full border border-line bg-card/85 pl-2.5 pr-4 text-sm font-medium text-ink shadow-soft backdrop-blur-md hover:bg-card hover:shadow-card active:scale-95"
+          aria-label="Go back to the previous screen"
+          title="Back"
         >
-          <svg className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ArrowLeft
+            className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5"
+            aria-hidden="true"
+          />
+          Back
         </button>
+      )}
+
+      {step != null && (
+        <div className="pointer-events-auto absolute left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-line bg-card/85 px-3 py-2 shadow-soft backdrop-blur-md">
+          {STEP_LABELS.map((label, i) => {
+            const n = i + 1;
+            const done = n < step;
+            const active = n === step;
+            return (
+              <span key={label} className="flex items-center gap-1.5">
+                <span
+                  className={`grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold transition-colors ${
+                    done
+                      ? 'bg-accent text-white'
+                      : active
+                        ? 'bg-ink text-white'
+                        : 'bg-paper-deep text-ink-faint'
+                  }`}
+                >
+                  {done ? <Check className="h-3 w-3" strokeWidth={3} /> : n}
+                </span>
+                <span
+                  className={`text-[11px] font-semibold transition-colors ${
+                    active ? 'text-ink' : 'text-ink-faint'
+                  } ${active ? 'inline' : 'hidden sm:inline'}`}
+                >
+                  {label}
+                </span>
+                {n < STEP_LABELS.length && (
+                  <span className={`mx-0.5 h-px w-3 ${done ? 'bg-accent' : 'bg-line-bold'}`} />
+                )}
+              </span>
+            );
+          })}
+        </div>
       )}
     </div>
   );

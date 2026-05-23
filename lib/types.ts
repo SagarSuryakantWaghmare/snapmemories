@@ -84,6 +84,8 @@ export interface ModalProps {
 export interface FloatingNavProps {
   onBack?: () => void;
   showBack?: boolean;
+  /** Highlights progress in the 3-step flow (Template → Frame → Result). */
+  step?: 1 | 2 | 3;
 }
 
 import type { PhotoStripTemplate } from '@/lib/templates';

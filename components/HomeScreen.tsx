@@ -1,67 +1,168 @@
 'use client';
 
-import { Check, Sparkles, Download, Camera, ArrowRight } from 'lucide-react';
+import { useRef } from 'react';
+import { Camera, Sparkles, Download, ArrowRight, Smile, Heart } from 'lucide-react';
 import { HomeScreenProps } from '@/lib/types';
+import { gsap, useGSAP, EASE, DUR, reducedMotion } from '@/lib/motion';
+
+const FEATURES = [
+  { icon: Camera, label: '4 auto shots' },
+  { icon: Sparkles, label: 'Live filters' },
+  { icon: Download, label: 'Instant download' },
+];
 
 export default function HomeScreen({ onEnter }: HomeScreenProps) {
-  return (
-    <main className="w-full h-full min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 flex flex-col items-center justify-center overflow-hidden p-4 relative">
-      <section className="w-full max-w-md rounded-3xl border border-black/15 bg-white/95 backdrop-blur p-5 sm:p-6 text-center shadow-[0_20px_40px_rgba(0,0,0,0.08)] animate-fade-in-up">
-        <p className="text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase text-gray-500 mb-2 opacity-75 hover:opacity-100 transition-opacity">
-          snapmemories
-        </p>
+  const root = useRef<HTMLElement>(null);
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black tracking-tight leading-tight">
-          Photo Booth
+  useGSAP(
+    () => {
+      if (reducedMotion()) return;
+
+      gsap.set('[data-strip]', { rotation: -5, transformOrigin: '50% 60%' });
+
+      gsap
+        .timeline({ defaults: { ease: EASE.out } })
+        .from('[data-strip-back]', { autoAlpha: 0, duration: DUR.base }, 0)
+        .from(
+          '[data-strip]',
+          { scale: 0.78, rotation: -22, autoAlpha: 0, duration: DUR.slow, ease: EASE.pop },
+          0,
+        )
+        .from(
+          '[data-reveal]',
+          { y: 30, autoAlpha: 0, duration: DUR.base, stagger: 0.08, clearProps: 'transform' },
+          0.32,
+        )
+        .from(
+          '[data-chip]',
+          {
+            y: 16,
+            scale: 0.9,
+            autoAlpha: 0,
+            duration: DUR.fast,
+            ease: EASE.pop,
+            stagger: 0.07,
+            clearProps: 'transform',
+          },
+          '-=0.3',
+        )
+        .from('[data-cta]', { y: 20, autoAlpha: 0, duration: DUR.base, clearProps: 'transform' }, '-=0.25')
+        .to(
+          '[data-strip]',
+          { y: -10, duration: 3.2, repeat: -1, yoyo: true, ease: 'sine.inOut' },
+          '>-0.4',
+        );
+    },
+    { scope: root },
+  );
+
+  return (
+    <main className="grain relative flex min-h-screen w-full flex-col overflow-hidden" ref={root}>
+      {/* Ambient warmth */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-accent-soft opacity-70 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-28 -left-24 h-72 w-72 rounded-full bg-paper-deep opacity-60 blur-3xl"
+      />
+
+      <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
+        {/* Hero polaroid */}
+        <div className="relative mb-7 h-[238px] w-[208px]">
+          <div
+            data-strip-back
+            aria-hidden
+            style={{ transform: 'translate(20px, 16px) rotate(9deg)' }}
+            className="absolute inset-0 rounded-2xl bg-accent-soft"
+          />
+          <div
+            data-strip
+            className="absolute inset-0 rounded-2xl bg-card p-3.5 pb-11 shadow-lift ring-1 ring-line"
+          >
+            <div className="relative h-full w-full overflow-hidden rounded-xl bg-gradient-to-br from-paper-deep to-cream ring-1 ring-line">
+              <Smile
+                className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 text-ink-faint"
+                strokeWidth={1.5}
+              />
+              <Sparkles className="absolute right-3 top-3 h-5 w-5 text-accent/70" />
+              <Heart className="absolute bottom-3 left-3 h-4 w-4 text-accent/45" />
+            </div>
+            <p className="absolute inset-x-0 bottom-3 text-center font-display text-[15px] italic text-ink-faint">
+              snapmemories
+            </p>
+          </div>
+        </div>
+
+        {/* Eyebrow */}
+        <span
+          data-reveal
+          className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-soft"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          The snapmemories booth
+        </span>
+
+        {/* Headline */}
+        <h1
+          data-reveal
+          className="mt-3.5 text-balance font-display text-[2.25rem] leading-[1.07] text-ink sm:text-5xl"
+        >
+          Strike a pose,
+          <br />
+          <span className="italic text-accent">keep the moment.</span>
         </h1>
 
-        <p className="text-sm sm:text-base text-gray-600 mt-3 mb-6 leading-relaxed">
-          Capture four moments and leave with a polished photo strip.
-        </p>
-
-        <div className="mx-auto mb-6 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border border-black/15 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-lg transition-shadow duration-300 group animate-scale-in">
-          <svg viewBox="0 0 120 120" className="text-black w-12 h-12 sm:w-14 sm:h-14 group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
-            <rect x="20" y="40" width="80" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="3" />
-            <circle cx="60" cy="70" r="20" fill="none" stroke="currentColor" strokeWidth="3" />
-            <circle cx="60" cy="70" r="12" fill="currentColor" opacity="0.12" />
-            <circle cx="85" cy="55" r="5" fill="currentColor" />
-            <rect x="45" y="28" width="30" height="8" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
-          </svg>
-        </div>
-
-        <div className="mb-6 flex flex-wrap justify-center gap-2.5 text-[11px] sm:text-xs text-gray-700">
-          <span className="rounded-full bg-gray-100 px-3 py-1.5 inline-flex items-center gap-1.5 hover:bg-gray-200 transition-colors duration-200 border border-gray-200 hover:border-gray-300 hover:shadow-sm animate-fade-in" style={{ animationDelay: '100ms' }}>
-            <Check className="w-3 h-3" /> 4 auto shots
-          </span>
-          <span className="rounded-full bg-gray-100 px-3 py-1.5 inline-flex items-center gap-1.5 hover:bg-gray-200 transition-colors duration-200 border border-gray-200 hover:border-gray-300 hover:shadow-sm animate-fade-in" style={{ animationDelay: '150ms' }}>
-            <Sparkles className="w-3 h-3" /> Live filters
-          </span>
-          <span className="rounded-full bg-gray-100 px-3 py-1.5 inline-flex items-center gap-1.5 hover:bg-gray-200 transition-colors duration-200 border border-gray-200 hover:border-gray-300 hover:shadow-sm animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <Download className="w-3 h-3" /> Instant download
-          </span>
-        </div>
-
-        <button
-          type="button"
-          onClick={onEnter}
-          className="w-full px-8 sm:px-10 py-3 sm:py-3.5 bg-gradient-to-r from-black to-gray-800 text-white text-sm sm:text-base font-bold rounded-full hover:shadow-button-hover active:scale-[0.98] shadow-xl inline-flex items-center justify-center gap-2 transition-all duration-200 min-h-12 group relative overflow-hidden"
-          aria-label="Start the photo booth application"
-          title="Start capturing photos"
+        {/* Subtitle */}
+        <p
+          data-reveal
+          className="mt-4 max-w-sm text-balance text-[14px] leading-relaxed text-ink-soft sm:text-[15px]"
         >
-          <span className="relative z-10 inline-flex items-center gap-2">
-            Start Photo Booth
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
-          </span>
-          <span className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-        </button>
-
-        <p className="mt-5 text-xs text-gray-500 inline-flex items-center justify-center gap-1 hover:text-gray-600 transition-colors">
-          <Camera className="w-3 h-3" /> Camera or upload • 4 automatic shots • instant download
+          Take four quick shots, then dress your strip with filters and frames — yours to
+          download in seconds.
         </p>
-      </section>
 
-      <footer className="absolute bottom-0 left-0 right-0 text-center safe-bottom animate-fade-in" style={{ animationDelay: '400ms' }}>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 tracking-wider hover:text-gray-600 dark:hover:text-gray-400 transition-colors">snapmemories by sagar</p>
+        {/* Feature chips */}
+        <div data-reveal className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+          {FEATURES.map(({ icon: Icon, label }) => (
+            <span
+              key={label}
+              data-chip
+              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card/80 px-3.5 py-2 text-xs font-medium text-ink-soft shadow-soft backdrop-blur"
+            >
+              <Icon className="h-3.5 w-3.5 text-accent" strokeWidth={2} />
+              {label}
+            </span>
+          ))}
+        </div>
+
+        {/* Call to action */}
+        <div data-cta className="mt-7 flex flex-col items-center gap-3">
+          <button
+            type="button"
+            onClick={onEnter}
+            className="group inline-flex min-h-14 items-center justify-center gap-2.5 rounded-full bg-accent px-10 py-4 text-base font-semibold text-white shadow-accent transition-[background-color,box-shadow,transform] hover:bg-accent-deep hover:shadow-lift active:scale-[0.97]"
+            aria-label="Start the photo booth"
+            title="Start capturing photos"
+          >
+            Enter the booth
+            <ArrowRight
+              className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </button>
+          <p className="inline-flex items-center gap-1.5 text-xs text-ink-faint">
+            <Camera className="h-3.5 w-3.5" strokeWidth={2} />
+            Use your camera or upload photos — no sign-up
+          </p>
+        </div>
+      </div>
+
+      <footer className="safe-bottom relative pb-4 text-center">
+        <p className="text-[11px] tracking-[0.16em] text-ink-faint">
+          snapmemories · crafted by sagar
+        </p>
       </footer>
     </main>
   );
